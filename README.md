@@ -18,6 +18,17 @@ This repository ("`Code - OSS`") is where we (Microsoft) develop the [Visual Stu
 
 Visual Studio Code is updated monthly with new features and bug fixes. You can download it for Windows, macOS, and Linux on the [Visual Studio Code website](https://code.visualstudio.com/Download). To get the latest releases every day, install the [Insiders build](https://code.visualstudio.com/insiders).
 
+## Fork Additions
+
+This fork adds an IntelliJ-inspired development experience while retaining the Code - OSS foundation:
+
+* **Java and Spring Boot setup:** [scripts/intellij/extensions.json](scripts/intellij/extensions.json) records the selected versions of Java language support, debugging, testing, Maven, Gradle, Spring Boot Tools, Spring Initializr, and Spring Boot Dashboard. The setup script copies these extensions from a local VS Code installation into a separate development profile; it does not bundle or download them.
+* **IntelliJ appearance:** the `IntelliJ Islands Dark` color theme and JetBrains-inspired keybindings are provided by the [IntelliJ Experience extension](extensions/intellij-experience/README.md). Fork branding assets and icon generation are documented in [scripts/intellij/UPSTREAM-SYNC.md](scripts/intellij/UPSTREAM-SYNC.md).
+* **Java navigation and search:** adds a compact symbol navigation popup, categorized reference results, class search, and a combined Search Everywhere picker for files, workspace symbols, and actions.
+* **Git convenience:** adds an extension for applying repository-specific Git info/exclude patterns.
+
+To prepare the separate IntelliJ development profile and launch this fork for a Java project, see the [IntelliJ Experience setup guide](extensions/intellij-experience/README.md). The normal Code - OSS profile remains separate.
+
 ## Contributing
 
 There are many ways in which you can participate in this project, for example:
