@@ -1,1 +1,9 @@
-<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><style>.st0{fill:#f6f6f6;fill-opacity:0}.st1{fill:#fff}.st2{fill:#167abf}</style><path class="st0" d="M1024 1024H0V0h1024v1024z"/><path class="st1" d="M1024 85.333v853.333H0V85.333h1024z"/><path class="st2" d="M0 85.333h298.667v853.333H0V85.333zm1024 0v853.333H384V85.333h640zm-554.667 160h341.333v-64H469.333v64zm341.334 533.334H469.333v64h341.333l.001-64zm128-149.334H597.333v64h341.333l.001-64zm0-149.333H597.333v64h341.333l.001-64zm0-149.333H597.333v64h341.333l.001-64z"/></svg>
+<!-- Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT License. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Blue cat application icon"><rect x="48" y="48" width="416" height="416" rx="106" fill="#fff" /><svg width="368" height="380" viewBox="0 0 512 512" role="img" aria-labelledby="title" x="72" y="66">
+  <title id="title">Blue seated cat with a curled tail</title>
+  <g fill="#007acc">
+    <path d="M260 419C198 453 112 431 76 377C41 325 52 261 95 225C134 192 181 195 212 221C241 245 250 287 228 319C207 350 169 359 143 338C117 318 118 283 141 266" fill="none" stroke="#007acc" stroke-width="18" stroke-linecap="round" />
+    <path d="M298 182C269 226 240 310 238 378C236 398 241 414 243 423C232 452 230 477 240 484C250 491 275 490 291 487C316 493 344 493 369 487C385 490 411 491 421 484C431 477 429 452 418 423C420 414 425 398 423 378C421 310 392 226 363 182Z" />
+    <path d="M262 72 279 18 307 59Q330 54 353 59L381 18 400 72C424 90 433 109 431 130C428 166 390 192 331 197C272 192 234 166 231 130C229 109 238 90 262 72Z M267 124C267 118 274 114 284 112L291 131L299 112C309 114 315 118 315 124C315 140 267 140 267 124Z M345 124C345 118 352 114 362 112L369 131L377 112C387 114 393 118 393 124C393 140 345 140 345 124Z" fill-rule="evenodd" />
+  </g>
+</svg></svg>

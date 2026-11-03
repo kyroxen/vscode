@@ -2206,7 +2206,7 @@ class EditorFontWeight extends BaseEditorOption<EditorOption.fontWeight, string,
 
 //#region gotoLocation
 
-export type GoToLocationValues = 'peek' | 'gotoAndPeek' | 'goto';
+export type GoToLocationValues = 'peek' | 'gotoAndPeek' | 'goto' | 'pick';
 
 /**
  * Configuration options for go to location
@@ -2255,12 +2255,13 @@ class EditorGoToLocation extends BaseEditorOption<EditorOption.gotoLocation, IGo
 		};
 		const jsonSubset: IJSONSchema = {
 			type: 'string',
-			enum: ['peek', 'gotoAndPeek', 'goto'],
+			enum: ['peek', 'gotoAndPeek', 'goto', 'pick'],
 			default: defaults.multiple,
 			enumDescriptions: [
 				nls.localize('editor.gotoLocation.multiple.peek', 'Show Peek view of the results (default)'),
 				nls.localize('editor.gotoLocation.multiple.gotoAndPeek', 'Go to the primary result and show a Peek view'),
-				nls.localize('editor.gotoLocation.multiple.goto', 'Go to the primary result and enable Peek-less navigation to others')
+				nls.localize('editor.gotoLocation.multiple.goto', 'Go to the primary result and enable Peek-less navigation to others'),
+				nls.localize('editor.gotoLocation.multiple.pick', "Choose a result from a list before navigating")
 			]
 		};
 		const alternativeCommandOptions = ['', 'editor.action.referenceSearch.trigger', 'editor.action.goToReferences', 'editor.action.peekImplementation', 'editor.action.goToImplementation', 'editor.action.peekTypeDefinition', 'editor.action.goToTypeDefinition', 'editor.action.peekDeclaration', 'editor.action.revealDeclaration', 'editor.action.peekDefinition', 'editor.action.revealDefinitionAside', 'editor.action.revealDefinition'];
@@ -2330,13 +2331,13 @@ class EditorGoToLocation extends BaseEditorOption<EditorOption.gotoLocation, IGo
 		}
 		const input = _input as Unknown<IGotoLocationOptions>;
 		return {
-			multiple: stringSet<GoToLocationValues>(input.multiple, this.defaultValue.multiple, ['peek', 'gotoAndPeek', 'goto']),
-			multipleDefinitions: stringSet<GoToLocationValues>(input.multipleDefinitions, 'peek', ['peek', 'gotoAndPeek', 'goto']),
-			multipleTypeDefinitions: stringSet<GoToLocationValues>(input.multipleTypeDefinitions, 'peek', ['peek', 'gotoAndPeek', 'goto']),
-			multipleDeclarations: stringSet<GoToLocationValues>(input.multipleDeclarations, 'peek', ['peek', 'gotoAndPeek', 'goto']),
-			multipleImplementations: stringSet<GoToLocationValues>(input.multipleImplementations, 'peek', ['peek', 'gotoAndPeek', 'goto']),
-			multipleReferences: stringSet<GoToLocationValues>(input.multipleReferences, 'peek', ['peek', 'gotoAndPeek', 'goto']),
-			multipleTests: stringSet<GoToLocationValues>(input.multipleTests, 'peek', ['peek', 'gotoAndPeek', 'goto']),
+			multiple: stringSet<GoToLocationValues>(input.multiple, this.defaultValue.multiple, ['peek', 'gotoAndPeek', 'goto', 'pick']),
+			multipleDefinitions: stringSet<GoToLocationValues>(input.multipleDefinitions, 'peek', ['peek', 'gotoAndPeek', 'goto', 'pick']),
+			multipleTypeDefinitions: stringSet<GoToLocationValues>(input.multipleTypeDefinitions, 'peek', ['peek', 'gotoAndPeek', 'goto', 'pick']),
+			multipleDeclarations: stringSet<GoToLocationValues>(input.multipleDeclarations, 'peek', ['peek', 'gotoAndPeek', 'goto', 'pick']),
+			multipleImplementations: stringSet<GoToLocationValues>(input.multipleImplementations, 'peek', ['peek', 'gotoAndPeek', 'goto', 'pick']),
+			multipleReferences: stringSet<GoToLocationValues>(input.multipleReferences, 'peek', ['peek', 'gotoAndPeek', 'goto', 'pick']),
+			multipleTests: stringSet<GoToLocationValues>(input.multipleTests, 'peek', ['peek', 'gotoAndPeek', 'goto', 'pick']),
 			alternativeDefinitionCommand: EditorStringOption.string(input.alternativeDefinitionCommand, this.defaultValue.alternativeDefinitionCommand),
 			alternativeTypeDefinitionCommand: EditorStringOption.string(input.alternativeTypeDefinitionCommand, this.defaultValue.alternativeTypeDefinitionCommand),
 			alternativeDeclarationCommand: EditorStringOption.string(input.alternativeDeclarationCommand, this.defaultValue.alternativeDeclarationCommand),

@@ -255,6 +255,7 @@ import './contrib/logs/common/logs.contribution.js';
 
 // Quickaccess
 import './contrib/quickaccess/browser/quickAccess.contribution.js';
+import './contrib/intellij/browser/intellij.contribution.js';
 
 // Explorer
 import './contrib/files/browser/explorerViewlet.js';

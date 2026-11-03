@@ -1,0 +1,63 @@
+{
+	"name": "intellij-experience",
+	"displayName": "%displayName%",
+	"description": "%description%",
+	"version": "0.1.0",
+	"publisher": "vscode",
+	"license": "MIT",
+	"engines": { "vscode": "^1.146.0" },
+	"categories": ["Keymaps", "Themes"],
+	"capabilities": {
+		"untrustedWorkspaces": { "supported": true },
+		"virtualWorkspaces": true
+	},
+	"contributes": {
+		"themes": [{
+			"label": "IntelliJ Islands Dark",
+			"uiTheme": "vs-dark",
+			"path": "./themes/intellij-islands-dark-color-theme.json"
+		}],
+		"configurationDefaults": {
+			"workbench.colorTheme": "IntelliJ Islands Dark",
+			"workbench.iconTheme": "vsc-jetbrains-icons-enhanced",
+			"workbench.editor.enablePreview": false,
+			"workbench.editor.enablePreviewFromQuickOpen": false,
+			"editor.multiCursorModifier": "alt",
+			"editor.definitionLinkOpensInPeek": false,
+			"breadcrumbs.enabled": true,
+			"search.quickOpen.includeSymbols": true,
+			"[java]": {
+				"editor.gotoLocation.multipleDefinitions": "pick",
+				"editor.gotoLocation.multipleDeclarations": "pick",
+				"editor.gotoLocation.multipleTypeDefinitions": "pick",
+				"editor.gotoLocation.multipleImplementations": "pick",
+				"editor.gotoLocation.multipleReferences": "pick"
+			}
+		},
+		"keybindings": [{
+			"key": "ctrl+alt+f7",
+			"mac": "cmd+alt+f7",
+			"command": "editor.action.goToReferences",
+			"when": "editorTextFocus && editorHasReferenceProvider && !inReferenceSearchEditor"
+		}, {
+			"key": "shift shift",
+			"command": "workbench.action.intellijSearchEverywhere",
+			"when": "!terminalFocus && !inputFocus"
+		}, {
+			"key": "ctrl+n",
+			"mac": "cmd+o",
+			"command": "intellij.goToClass",
+			"when": "!terminalFocus && !inputFocus"
+		}, {
+			"key": "ctrl+alt+shift+n",
+			"mac": "cmd+alt+o",
+			"command": "workbench.action.showAllSymbols",
+			"when": "!terminalFocus && !inputFocus"
+		}, {
+			"key": "ctrl+shift+b",
+			"mac": "cmd+shift+b",
+			"command": "editor.action.goToTypeDefinition",
+			"when": "editorTextFocus && editorHasTypeDefinitionProvider"
+		}]
+	}
+}

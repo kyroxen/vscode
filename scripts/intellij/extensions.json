@@ -1,0 +1,15 @@
+{
+	"vmware.vscode-spring-boot": "2.4.1",
+	"redhat.java": "1.58.0",
+	"vscjava.vscode-spring-initializr": "0.12.1",
+	"vmware.vscode-boot-dev-pack": "0.2.2",
+	"vscjava.vscode-java-dependency": "0.27.7",
+	"vscjava.vscode-java-debug": "0.60.0",
+	"vscjava.vscode-java-pack": "0.31.2",
+	"vscjava.vscode-maven": "0.46.0",
+	"k--kato.intellij-idea-keybindings": "1.7.8",
+	"vscjava.vscode-spring-boot-dashboard": "0.15.0",
+	"brennondenny.vsc-jetbrains-icons-enhanced": "2.3.0",
+	"vscjava.vscode-gradle": "3.18.1",
+	"vscjava.vscode-java-test": "0.47.0"
+}

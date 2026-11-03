@@ -583,6 +583,24 @@ export class AnythingQuickAccessProvider extends PickerQuickAccessProvider<IAnyt
 		};
 	}
 
+	/** Starts a combined search with the same cache lifecycle as the native file picker. */
+	beginSearchEverywhere(picker: IQuickPick<IAnythingQuickPickItem, { useSeparators: true }>): void {
+		this.pickState.set(picker, true);
+	}
+
+	/** Returns history immediately; workspace symbols are collected independently by the caller. */
+	getSearchEverywherePicks(filter: string, token: CancellationToken): FastAndSlowPicks<IAnythingQuickPickItem> {
+		const query = prepareQuery(filter);
+		const history = this.getEditorHistoryPicks(query);
+		const excludes = new ResourceMap<boolean>(uri => this.uriIdentityService.extUri.getComparisonKey(uri));
+		for (const pick of history) {
+			if (pick.resource) {
+				excludes.set(pick.resource, true);
+			}
+		}
+		return { picks: history, additionalPicks: this.getAdditionalPicks(query, excludes, false, token) };
+	}
+
 	private async getAdditionalPicks(query: IPreparedQuery, excludes: ResourceMap<boolean>, includeSymbols: boolean, token: CancellationToken, runOptions?: IAnythingQuickAccessProviderRunOptions): Promise<Array<IAnythingQuickPickItem>> {
 
 		// Resolve file and symbol picks (if enabled)
