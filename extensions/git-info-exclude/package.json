@@ -43,6 +43,11 @@
 				"command": "gitInfoExclude.addToGitignore",
 				"title": "%gitInfoExclude.addToGitignore%",
 				"category": "Git"
+			},
+			{
+				"command": "gitInfoExclude.compareWith",
+				"title": "%gitInfoExclude.compareWith%",
+				"category": "Git"
 			}
 		],
 		"submenus": [
@@ -70,7 +75,7 @@
 				{
 					"submenu": "gitInfoExclude.explorerGitSubmenu",
 					"group": "5_git@1",
-					"when": "git.enabled && resourceScheme == file"
+					"when": "config.git.enabled && resourceScheme == file"
 				}
 			],
 			"gitInfoExclude.explorerGitSubmenu": [
@@ -89,6 +94,11 @@
 				{
 					"command": "gitInfoExclude.addToExclude",
 					"group": "2_modification@1"
+				},
+				{
+					"command": "gitInfoExclude.compareWith",
+					"when": "!explorerResourceIsFolder && !listMultiSelection",
+					"group": "3_compare@1"
 				}
 			],
 			"commandPalette": [
@@ -106,6 +116,10 @@
 				},
 				{
 					"command": "gitInfoExclude.addToGitignore",
+					"when": "false"
+				},
+				{
+					"command": "gitInfoExclude.compareWith",
 					"when": "false"
 				}
 			]

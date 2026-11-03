@@ -11,7 +11,7 @@ import { parseArgs } from 'node:util';
 import { applyEdits, modify, parse, type ParseError } from 'jsonc-parser';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
-const profileVersion = 2;
+const profileVersion = 3;
 const readJSON = async <T>(file: string | URL): Promise<T> => JSON.parse(await readFile(file, 'utf8'));
 
 interface ExtensionManifest {
@@ -172,6 +172,11 @@ export async function setupIntelliJ({ source, profile, versions, tooling = 'all'
 	}
 	const defaults = { ...preferences.contributes.configurationDefaults, ...(runtimes.length ? { 'java.configuration.runtimes': runtimes } : {}) };
 	for (const [key, value] of Object.entries(defaults)) {
+		// Keep appearance at the default layer so project detection can specialize it.
+		// Existing explicit values have no provenance and must remain untouched.
+		if (key === 'workbench.colorTheme' || key === 'workbench.iconTheme') {
+			continue;
+		}
 		if (!Object.hasOwn(settings, key)) {
 			settingsText = applyEdits(settingsText, modify(settingsText, [key], value, { formattingOptions: { insertSpaces: false, tabSize: 4 } }));
 		} else if (key.startsWith('[') && typeof value === 'object' && !Array.isArray(value) && settings[key] && typeof settings[key] === 'object' && !Array.isArray(settings[key])) {

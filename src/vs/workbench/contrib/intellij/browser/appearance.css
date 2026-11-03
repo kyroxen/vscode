@@ -9,3 +9,11 @@
 	box-sizing: border-box;
 	padding-bottom: var(--vscode-spacing-size20);
 }
+
+/* Decorate the name container so native Git strikethrough on its child remains intact. */
+.monaco-workbench .explorer-folders-view .intellij-explorer-error .monaco-icon-name-container {
+	text-decoration-line: underline;
+	text-decoration-style: wavy;
+	text-decoration-color: var(--vscode-editorError-foreground);
+	text-underline-offset: 0.15em;
+}

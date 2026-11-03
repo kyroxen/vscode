@@ -18,6 +18,9 @@
 			"path": "./themes/intellij-islands-dark-color-theme.json"
 		}],
 		"configurationDefaults": {
+			"problems.decorations.enabled": false,
+			"chat.titleBar.openInAgentsWindow.enabled": false,
+			"chat.titleBar.signIn.enabled": false,
 			"workbench.colorTheme": "Dark Modern",
 			"workbench.iconTheme": "vs-seti",
 			"workbench.colorCustomizations": {

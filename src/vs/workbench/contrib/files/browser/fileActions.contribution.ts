@@ -28,6 +28,8 @@ import { IExplorerService } from './files.js';
 import { Codicon } from '../../../../base/common/codicons.js';
 import { Categories } from '../../../../platform/action/common/actionCommonCategories.js';
 
+import { explorerNewMenu } from '../../intellij/browser/explorerMenus.js';
+
 // Contribute Global Actions
 
 registerAction2(GlobalCompareResourcesAction);
@@ -475,26 +477,24 @@ MenuRegistry.appendMenuItem(MenuId.OpenEditorsContext, {
 
 // Menu registration - explorer
 
-MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
+MenuRegistry.appendMenuItem(explorerNewMenu, {
 	group: 'navigation',
 	order: 4,
 	command: {
 		id: NEW_FILE_COMMAND_ID,
 		title: NEW_FILE_LABEL,
 		precondition: ExplorerResourceWritableContext
-	},
-	when: ExplorerFolderContext
+	}
 });
 
-MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
+MenuRegistry.appendMenuItem(explorerNewMenu, {
 	group: 'navigation',
 	order: 6,
 	command: {
 		id: NEW_FOLDER_COMMAND_ID,
 		title: NEW_FOLDER_LABEL,
 		precondition: ExplorerResourceWritableContext
-	},
-	when: ExplorerFolderContext
+	}
 });
 
 MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {

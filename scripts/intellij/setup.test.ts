@@ -61,6 +61,20 @@ test('setup provisions the shared theme colors and preserves explicit user color
 	assert.strictEqual(parse(await readFile(settingsFile, 'utf8'))['workbench.colorCustomizations']['[Dark Modern]']['editor.background'], '#123456');
 });
 
+test('setup leaves theme selection at the default layer and preserves existing appearance choices', async t => {
+	const options = await fixture(t);
+	await setupIntelliJ(options);
+	const settingsFile = path.join(options.profile, 'user-data', 'User', 'settings.json');
+	const settings = parse(await readFile(settingsFile, 'utf8'));
+	assert.deepStrictEqual([settings['workbench.colorTheme'], settings['workbench.iconTheme']], [undefined, undefined]);
+	// Older generated values are indistinguishable from intentional choices.
+	const appearance = { 'workbench.colorTheme': 'Dark Modern', 'workbench.iconTheme': 'vs-seti' };
+	await writeFile(settingsFile, JSON.stringify({ ...settings, ...appearance }));
+	await setupIntelliJ(options);
+	const updated = parse(await readFile(settingsFile, 'utf8'));
+	assert.deepStrictEqual([updated['workbench.colorTheme'], updated['workbench.iconTheme']], Object.values(appearance));
+});
+
 test('setup rejects missing pinned tooling before creating the profile', async t => {
 	const options = await fixture(t);
 	options.versions['missing.java'] = '1.0.0';

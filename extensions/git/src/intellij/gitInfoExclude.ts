@@ -9,11 +9,12 @@ import { commands, Disposable, l10n, ProgressLocation, SourceControlResourceStat
 import type { Model } from '../model';
 import type { Repository } from '../repository';
 import { appendExcludePatterns, excludePattern } from './excludePatterns';
+import { compareGitFile } from './compareWith';
 
 export function registerGitInfoExclude(model: Model): Disposable {
 	// Serialize writes so simultaneous invocations cannot overwrite one another.
 	let pending = Promise.resolve();
-	const registrations = ['addToExclude', 'addToGitignore', 'stageChanges', 'discardChanges'].map(action =>
+	const registrations = ['addToExclude', 'addToGitignore', 'stageChanges', 'discardChanges', 'compareWith'].map(action =>
 		commands.registerCommand(`gitInfoExclude.${action}`, (first: Uri | SourceControlResourceState | undefined, ...rest: (Uri | SourceControlResourceState | (Uri | SourceControlResourceState)[])[]) => {
 			const run = async () => {
 				try {
@@ -24,6 +25,10 @@ export function registerGitInfoExclude(model: Model): Disposable {
 					}
 					if (!uris.length) {
 						throw new Error(l10n.t('No file selected.'));
+					}
+					if (action === 'compareWith') {
+						await compareGitFile(model, uris);
+						return;
 					}
 					const repositories = new Map<Repository, Map<string, Uri>>();
 					for (const uri of uris) {
@@ -73,6 +78,9 @@ export function registerGitInfoExclude(model: Model): Disposable {
 					void window.showErrorMessage(l10n.t('Git action failed: {0}', error.message));
 				}
 			};
+			if (action === 'compareWith') {
+				return run();
+			}
 			pending = pending.then(() => window.withProgress({ location: ProgressLocation.Window, title: l10n.t('Updating Git…') }, run));
 			return pending;
 		}));

@@ -8,10 +8,12 @@ import { registerAction2 } from '../../../../platform/actions/common/actions.js'
 import { Extensions, IQuickAccessRegistry } from '../../../../platform/quickinput/common/quickAccess.js';
 import { registerWorkbenchContribution2, WorkbenchPhase } from '../../../common/contributions.js';
 import { SourceOriginContribution } from './sourceOrigin.js';
+import { ProjectAppearanceContribution } from './projectAppearance.js';
 import { Registry } from '../../../../platform/registry/common/platform.js';
 import { IntelliJClassQuickAccessProvider, IntelliJGoToClassAction } from './classSearch.js';
 import { IntelliJQuickAccessProvider, IntelliJSearchEverywhereAction } from './searchEverywhere.js';
 import './appearance.css';
+import './explorerErrorUnderline.js';
 
 Registry.as<IQuickAccessRegistry>(Extensions.Quickaccess).registerQuickAccessProvider({
 	ctor: IntelliJQuickAccessProvider,
@@ -32,3 +34,5 @@ Registry.as<IQuickAccessRegistry>(Extensions.Quickaccess).registerQuickAccessPro
 registerAction2(IntelliJGoToClassAction);
 
 registerWorkbenchContribution2(SourceOriginContribution.ID, SourceOriginContribution, WorkbenchPhase.BlockRestore);
+
+registerWorkbenchContribution2(ProjectAppearanceContribution.ID, ProjectAppearanceContribution, WorkbenchPhase.AfterRestored);
