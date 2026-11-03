@@ -29,6 +29,7 @@ import { GitCommitInputBoxCodeActionsProvider, GitCommitInputBoxDiagnosticsManag
 import { GitBlameController } from './blame';
 import { CloneManager } from './cloneManager';
 import { getAskpassPaths } from './askpassManager';
+import { registerGitInfoExclude } from './intellij/gitInfoExclude';
 
 const deactivateTasks: { (): Promise<void> }[] = [];
 
@@ -115,6 +116,7 @@ async function createModel(context: ExtensionContext, logger: LogOutputChannel, 
 	const cc = new CommandCenter(git, model, context.globalState, logger, telemetryReporter, cloneManager);
 	disposables.push(
 		cc,
+		registerGitInfoExclude(model),
 		new GitFileSystemProvider(model, logger),
 		new GitDecorations(model),
 		new GitBlameController(model),

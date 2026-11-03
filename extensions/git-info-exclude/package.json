@@ -1,0 +1,117 @@
+{
+	"name": "git-info-exclude",
+	"displayName": "%displayName%",
+	"description": "%description%",
+	"version": "0.1.0",
+	"publisher": "kyroxen",
+	"private": true,
+	"license": "MIT",
+	"author": "kyroxen",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/kyroxen/vscode-git-info-exclude.git"
+	},
+	"bugs": {
+		"url": "https://github.com/kyroxen/vscode-git-info-exclude/issues"
+	},
+	"homepage": "https://github.com/kyroxen/vscode-git-info-exclude#readme",
+	"engines": {
+		"vscode": "^1.85.0"
+	},
+	"categories": [
+		"SCM Providers",
+		"Other"
+	],
+	"contributes": {
+		"commands": [
+			{
+				"command": "gitInfoExclude.addToExclude",
+				"title": "%gitInfoExclude.addToExclude%",
+				"category": "Git"
+			},
+			{
+				"command": "gitInfoExclude.discardChanges",
+				"title": "%gitInfoExclude.discardChanges%",
+				"category": "Git"
+			},
+			{
+				"command": "gitInfoExclude.stageChanges",
+				"title": "%gitInfoExclude.stageChanges%",
+				"category": "Git"
+			},
+			{
+				"command": "gitInfoExclude.addToGitignore",
+				"title": "%gitInfoExclude.addToGitignore%",
+				"category": "Git"
+			}
+		],
+		"submenus": [
+			{
+				"id": "gitInfoExclude.explorerGitSubmenu",
+				"label": "Git"
+			}
+		],
+		"menus": {
+			"scm/resourceState/context": [
+				{
+					"command": "gitInfoExclude.addToExclude",
+					"when": "scmProvider == git",
+					"group": "2_gitInfoExclude@1"
+				}
+			],
+			"scm/resourceFolder/context": [
+				{
+					"command": "gitInfoExclude.addToExclude",
+					"when": "scmProvider == git",
+					"group": "2_gitInfoExclude@1"
+				}
+			],
+			"explorer/context": [
+				{
+					"submenu": "gitInfoExclude.explorerGitSubmenu",
+					"group": "5_git@1",
+					"when": "git.enabled && resourceScheme == file"
+				}
+			],
+			"gitInfoExclude.explorerGitSubmenu": [
+				{
+					"command": "gitInfoExclude.discardChanges",
+					"group": "1_modification@1"
+				},
+				{
+					"command": "gitInfoExclude.stageChanges",
+					"group": "1_modification@2"
+				},
+				{
+					"command": "gitInfoExclude.addToGitignore",
+					"group": "1_modification@3"
+				},
+				{
+					"command": "gitInfoExclude.addToExclude",
+					"group": "2_modification@1"
+				}
+			],
+			"commandPalette": [
+				{
+					"command": "gitInfoExclude.addToExclude",
+					"when": "false"
+				},
+				{
+					"command": "gitInfoExclude.discardChanges",
+					"when": "false"
+				},
+				{
+					"command": "gitInfoExclude.stageChanges",
+					"when": "false"
+				},
+				{
+					"command": "gitInfoExclude.addToGitignore",
+					"when": "false"
+				}
+			]
+		}
+	},
+	"extensionDependencies": [
+		"vscode.git"
+	]
+}

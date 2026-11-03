@@ -1,0 +1,395 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.intellij-symbol-popup {
+	position: relative;
+	width: min(60rem, calc(100vw - 2rem));
+	box-sizing: border-box;
+	overflow: hidden;
+	color: var(--vscode-editorWidget-foreground);
+	background: var(--vscode-editorWidget-background);
+	border: var(--vscode-strokeThickness) solid var(--vscode-editorWidget-border, var(--vscode-contrastBorder, transparent));
+	border-radius: var(--vscode-cornerRadius-large);
+	box-shadow: var(--vscode-shadow-lg);
+	font: inherit;
+}
+
+.intellij-symbol-popup-header,
+.intellij-symbol-popup-controls {
+	display: flex;
+	align-items: center;
+	gap: var(--vscode-spacing-size80);
+	padding: var(--vscode-spacing-size80) var(--vscode-spacing-size120);
+}
+
+.intellij-symbol-popup-header {
+	background: var(--vscode-editorGroupHeader-tabsBackground);
+	border-bottom: var(--vscode-strokeThickness) solid var(--vscode-editorWidget-border, var(--vscode-contrastBorder, transparent));
+}
+
+.intellij-symbol-popup-title {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-weight: var(--vscode-fontWeight-semiBold);
+}
+
+.intellij-symbol-popup-count,
+.intellij-symbol-popup-line,
+.intellij-symbol-popup-path,
+.intellij-symbol-popup-footer {
+	color: var(--vscode-descriptionForeground);
+	font-size: inherit;
+}
+
+.intellij-symbol-popup button {
+	min-height: 24px;
+	min-width: 24px;
+	padding: var(--vscode-spacing-size40) var(--vscode-spacing-size80);
+	border: var(--vscode-strokeThickness) solid transparent;
+	border-radius: var(--vscode-cornerRadius-small);
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+	touch-action: manipulation;
+	white-space: nowrap;
+}
+
+.intellij-symbol-popup button:hover {
+	background: var(--vscode-toolbar-hoverBackground);
+}
+
+.intellij-symbol-popup button[aria-pressed="true"] {
+	background: var(--vscode-inputOption-activeBackground);
+	border-color: var(--vscode-inputOption-activeBorder);
+	color: var(--vscode-inputOption-activeForeground);
+}
+
+.intellij-symbol-popup button:focus-visible,
+.intellij-symbol-popup input:focus-visible {
+	outline: var(--vscode-strokeThickness) solid var(--vscode-focusBorder);
+	outline-offset: -1px;
+}
+
+.intellij-symbol-popup-filter {
+	flex: 1;
+	min-width: 0;
+	box-sizing: border-box;
+	min-height: 28px;
+	padding: var(--vscode-spacing-size40) var(--vscode-spacing-size80);
+	border: var(--vscode-strokeThickness) solid var(--vscode-input-border, transparent);
+	border-radius: var(--vscode-cornerRadius-small);
+	background: var(--vscode-input-background);
+	color: var(--vscode-input-foreground);
+	font: inherit;
+}
+
+.intellij-symbol-popup-filter-label {
+	display: flex;
+	align-items: center;
+	gap: var(--vscode-spacing-size80);
+	flex: 1;
+	min-width: 0;
+}
+
+.intellij-symbol-popup-filter::placeholder {
+	color: var(--vscode-input-placeholderForeground);
+}
+
+.intellij-symbol-popup-row {
+	display: grid;
+	align-items: center;
+	box-sizing: border-box;
+	height: 100%;
+	width: 100%;
+}
+
+.intellij-symbol-popup-file-cell,
+.intellij-symbol-popup-source-cell {
+	display: flex;
+	align-items: center;
+	gap: var(--vscode-spacing-size80);
+	min-width: 0;
+	box-sizing: border-box;
+	padding-inline: var(--vscode-spacing-size120);
+}
+
+.intellij-symbol-popup-file {
+	font-weight: var(--vscode-fontWeight-regular);
+}
+
+.intellij-symbol-popup-icon[hidden] {
+	display: none;
+}
+
+.intellij-symbol-popup-line {
+	flex: 0 0 4ch;
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+	line-height: normal;
+}
+
+.intellij-symbol-popup-code {
+	flex: 1;
+	font-family: var(--monaco-monospace-font);
+}
+
+.intellij-symbol-popup-file-group {
+	display: flex;
+	border-top: var(--vscode-strokeThickness) solid var(--vscode-editorWidget-border, var(--vscode-contrastBorder, transparent));
+}
+
+.intellij-symbol-popup-file-group .intellij-symbol-popup-file-cell {
+	flex: 1;
+	padding-left: 40px;
+}
+
+.intellij-symbol-popup-file-group .intellij-symbol-popup-file {
+	font-weight: var(--vscode-fontWeight-semiBold);
+}
+
+.intellij-symbol-popup-file-group .intellij-symbol-popup-source-cell {
+	flex: 0 0 auto;
+}
+
+.intellij-symbol-popup-file-group .intellij-symbol-popup-code,
+.intellij-symbol-popup-file-group .intellij-symbol-popup-path {
+	display: none;
+}
+
+.intellij-symbol-popup-code .highlight {
+	color: var(--vscode-list-highlightForeground);
+	font-weight: inherit;
+}
+
+.intellij-symbol-popup-path {
+	padding-inline: var(--vscode-spacing-size120);
+	text-align: left;
+}
+
+.intellij-symbol-popup-file,
+.intellij-symbol-popup-code,
+.intellij-symbol-popup-path {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.intellij-symbol-popup .monaco-list-row.focused .intellij-symbol-popup-line,
+.intellij-symbol-popup .monaco-list-row.focused .intellij-symbol-popup-path {
+	color: inherit;
+}
+
+.intellij-symbol-popup-footer,
+.intellij-symbol-popup-empty {
+	padding: var(--vscode-spacing-size80) var(--vscode-spacing-size120);
+}
+
+.intellij-symbol-popup-footer {
+	border-top: var(--vscode-strokeThickness) solid var(--vscode-editorWidget-border, var(--vscode-contrastBorder, transparent));
+}
+
+@media (max-width: 640px) {
+	.intellij-symbol-popup {
+		font-size: 1rem;
+	}
+
+	.intellij-symbol-popup-header,
+	.intellij-symbol-popup-controls {
+		flex-wrap: wrap;
+	}
+
+	.intellij-symbol-popup button {
+		min-height: 44px;
+		min-width: 44px;
+	}
+
+	.intellij-symbol-popup-path {
+		display: none;
+	}
+}
+
+.intellij-symbol-popup-list {
+	overflow: hidden;
+}
+
+.intellij-symbol-popup-columns {
+	position: relative;
+	display: flex;
+	align-items: center;
+	background: var(--vscode-editor-background);
+	min-height: 28px;
+	border-block: var(--vscode-strokeThickness) solid var(--vscode-editorWidget-border, var(--vscode-contrastBorder, transparent));
+	color: var(--vscode-descriptionForeground);
+	font-size: inherit;
+}
+
+.intellij-symbol-popup-columns > span {
+	box-sizing: border-box;
+	padding-inline: var(--vscode-spacing-size120);
+}
+
+.intellij-symbol-popup-column-resize {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 24px;
+	transform: translateX(-50%);
+	cursor: col-resize;
+	touch-action: none;
+}
+
+.intellij-symbol-popup-column-resize::after {
+	content: '';
+	position: absolute;
+	left: 11px;
+	top: 4px;
+	bottom: 4px;
+	border-left: 1px solid var(--vscode-descriptionForeground);
+}
+
+.intellij-symbol-popup-column-resize:hover::after,
+.intellij-symbol-popup-column-resize:focus-visible::after {
+	border-color: var(--vscode-focusBorder);
+	border-left-width: 2px;
+}
+
+.intellij-symbol-popup-column-resize:focus-visible {
+	outline: 1px solid var(--vscode-focusBorder);
+	outline-offset: -2px;
+}
+
+.intellij-symbol-popup button.intellij-symbol-popup-resize {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	cursor: nwse-resize;
+	touch-action: none;
+	padding: 4px;
+}
+
+.intellij-symbol-popup-footer {
+	padding-right: 32px;
+}
+
+.intellij-symbol-popup-file-group .intellij-symbol-popup-line {
+	border-radius: var(--vscode-cornerRadius-small);
+	background: var(--vscode-badge-background);
+	color: var(--vscode-badge-foreground);
+	padding: 2px 6px;
+	flex: none;
+	min-width: 2ch;
+	text-align: center;
+	line-height: 1.2;
+}
+
+.intellij-symbol-popup-row[data-category="implementations"] .intellij-symbol-popup-icon {
+	color: var(--vscode-symbolIcon-classForeground);
+}
+
+.intellij-symbol-popup-row[data-category="usages"] .intellij-symbol-popup-icon {
+	color: var(--vscode-symbolIcon-methodForeground);
+}
+
+.intellij-symbol-popup-row[data-category="tests"] .intellij-symbol-popup-icon {
+	color: var(--vscode-testing-iconPassed);
+}
+
+.intellij-symbol-popup-row[data-category="documentation"] .intellij-symbol-popup-icon {
+	color: var(--vscode-symbolIcon-stringForeground);
+}
+
+.intellij-symbol-popup-row[data-category="declarations"] .intellij-symbol-popup-icon {
+	color: var(--vscode-symbolIcon-interfaceForeground);
+}
+
+.intellij-symbol-popup-row[data-category="imports"] .intellij-symbol-popup-icon {
+	color: var(--vscode-symbolIcon-namespaceForeground);
+}
+
+.intellij-symbol-popup-row[data-category="resources"] .intellij-symbol-popup-icon {
+	color: var(--vscode-symbolIcon-propertyForeground);
+}
+
+/* The tree owns focus/selection painting. Content must never cover that background. */
+.intellij-symbol-popup-list .monaco-tl-twistie {
+	position: absolute;
+	left: 8px;
+	z-index: 1;
+	padding: 0;
+	transform: none;
+}
+
+.intellij-symbol-popup-list .monaco-tl-contents {
+	width: 100%;
+	padding: 0 !important;
+}
+
+.intellij-symbol-popup-list .monaco-tl-indent {
+	display: none;
+}
+
+.intellij-symbol-popup-preview {
+	max-width: min(52rem, 80vw);
+}
+
+.intellij-symbol-popup-preview-title {
+	padding: 8px 12px;
+	color: var(--vscode-descriptionForeground);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.intellij-symbol-popup-preview pre {
+	margin: 0;
+	padding: 8px 12px;
+	overflow: auto;
+	line-height: 1.5;
+}
+
+.intellij-symbol-popup-preview .match {
+	background: var(--vscode-editor-lineHighlightBackground);
+	box-shadow: inset 2px 0 var(--vscode-list-highlightForeground);
+}
+
+/* Darken result rows; section headings retain the popup background. */
+.intellij-symbol-popup-row:not(.intellij-symbol-popup-file-group) {
+	background: var(--vscode-editor-background);
+}
+
+.intellij-symbol-popup-list .monaco-list:focus-within .monaco-list-row.focused .intellij-symbol-popup-row,
+.intellij-symbol-popup-list .monaco-list:focus-within .monaco-list-row.selected .intellij-symbol-popup-row,
+.intellij-symbol-popup-list .monaco-list-row:hover .intellij-symbol-popup-row {
+	background: transparent;
+}
+
+/* The initial keyboard destination should not look selected while filtering. */
+.intellij-symbol-popup-list .monaco-list:not(:focus-within) .monaco-list-row.focused.selected:not(:hover) {
+	background: transparent;
+}
+
+.intellij-symbol-popup-origin {
+	flex: 0 0 auto;
+	padding: 0 0.4em;
+	border: var(--vscode-strokeThickness) solid var(--vscode-contrastBorder, transparent);
+	border-radius: var(--vscode-cornerRadius-small);
+	background: var(--vscode-badge-background);
+	color: var(--vscode-badge-foreground);
+	font-size: 0.85em;
+	line-height: 1.5;
+}
+
+.intellij-symbol-popup-origin[hidden] {
+	display: none;
+}
+
+.intellij-symbol-popup-preview-title {
+	white-space: pre-line;
+}

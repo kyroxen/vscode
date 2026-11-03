@@ -1,4 +1,21 @@
 # Visual Studio Code - Open Source ("Code - OSS")
+
+## This Fork: IntelliJ-Inspired Java and Spring Boot Development
+
+<p align="center">
+  <img alt="Blue cat application icon for this fork" src="resources/intellij/cat-app.svg" width="128">
+</p>
+
+This fork keeps the Code - OSS foundation and adds an IntelliJ-inspired experience for Java and Spring Boot development:
+
+* **Fork icon and branding:** blue cat application icon across desktop and web assets, with source assets and regeneration steps in [the sync guide](scripts/intellij/UPSTREAM-SYNC.md).
+* **IntelliJ appearance:** `IntelliJ Islands Dark` theme and JetBrains-inspired keybindings from the [IntelliJ Experience extension](extensions/intellij-experience/README.md).
+* **Java and Spring Boot setup:** versioned Java language, debugger, test, Maven, Gradle, Spring Boot Tools, Initializr, and Dashboard extensions in [the setup manifest](scripts/intellij/extensions.json). Setup copies them from a local VS Code extensions directory into a separate profile; they are not bundled or downloaded.
+* **Navigation and search:** compact symbol navigation with categorized references, class search, and Search Everywhere for files, workspace symbols, and actions.
+* **Git convenience:** a fork extension for repository-specific Git info/exclude patterns.
+
+Prepare the separate development profile and launch this fork for a Java project using the [IntelliJ Experience setup guide](extensions/intellij-experience/README.md).
+
 [![Feature Requests](https://img.shields.io/github/issues/microsoft/vscode/feature-request.svg)](https://github.com/microsoft/vscode/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request+sort%3Areactions-%2B1-desc)
 [![Bugs](https://img.shields.io/github/issues/microsoft/vscode/bug.svg)](https://github.com/microsoft/vscode/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3Abug)
 

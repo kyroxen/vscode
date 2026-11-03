@@ -22,7 +22,7 @@ import { EditorContextKeys } from '../../../common/editorContextKeys.js';
 import { ITextModel } from '../../../common/model.js';
 import { isLocationLink, Location, LocationLink } from '../../../common/languages.js';
 import { ReferencesController } from './peek/referencesController.js';
-import { ReferencesModel } from './referencesModel.js';
+import { OneReference, ReferencesModel } from './referencesModel.js';
 import { ISymbolNavigationService } from './symbolNavigation.js';
 import { MessageController } from '../../message/browser/messageController.js';
 import { PeekContext } from '../../peekView/browser/peekView.js';
@@ -40,6 +40,7 @@ import { IWordAtPosition } from '../../../common/core/wordHelper.js';
 import { ILanguageFeaturesService } from '../../../common/services/languageFeatures.js';
 import { Iterable } from '../../../../base/common/iterator.js';
 import { IsWebContext } from '../../../../platform/contextkey/common/contextkeys.js';
+import { shouldPickSymbolNavigation, SymbolNavigationPicker } from './symbolNavigationPicker.js';
 
 MenuRegistry.appendMenuItem(MenuId.EditorContext, {
 	submenu: MenuId.EditorContextPeek,
@@ -137,7 +138,7 @@ export abstract class SymbolNavigationAction extends EditorAction2 {
 
 			const referenceCount = references.references.length;
 
-			if (referenceCount === 0) {
+			if (referenceCount === 0 && !shouldPickSymbolNavigation(this._getGoToPreference(editor), referenceCount, this.desc.id === 'editor.action.goToReferences')) {
 				// no result -> show message
 				if (!this.configuration.muteMessage) {
 					const info = model.getWordAtPosition(position);
@@ -152,7 +153,7 @@ export abstract class SymbolNavigationAction extends EditorAction2 {
 
 			} else {
 				// normal results handling
-				return this._onResult(editorService, symbolNavService, editor, references, range);
+				return this._onResult(instaService, editorService, symbolNavService, editor, references, cts.token, range);
 			}
 
 		}, (err) => {
@@ -174,12 +175,24 @@ export abstract class SymbolNavigationAction extends EditorAction2 {
 
 	protected abstract _getGoToPreference(editor: IActiveCodeEditor): GoToLocationValues;
 
-	private async _onResult(editorService: ICodeEditorService, symbolNavService: ISymbolNavigationService, editor: IActiveCodeEditor, model: ReferencesModel, range?: Range): Promise<void> {
+	private async _onResult(instantiationService: IInstantiationService, editorService: ICodeEditorService, symbolNavService: ISymbolNavigationService, editor: IActiveCodeEditor, model: ReferencesModel, token: CancellationToken, range?: Range): Promise<void> {
 
 		const gotoLocation = this._getGoToPreference(editor);
 		if (!(editor instanceof EmbeddedCodeEditorWidget) && (this.configuration.openInPeek || (gotoLocation === 'peek' && model.references.length > 1))) {
 			this._openInPeek(editor, model, range);
 
+		} else if (shouldPickSymbolNavigation(gotoLocation, model.references.length, this.desc.id === 'editor.action.goToReferences')) {
+			try {
+				const reference = await instantiationService.createInstance(SymbolNavigationPicker).pick(model, token, editor, this.desc.id === 'editor.action.goToReferences');
+				if (reference && !(reference instanceof OneReference)) {
+					this._openInPeek(editor, new ReferencesModel(reference.references, model.title), range);
+					return;
+				} else if (reference) {
+					await this._openReference(editor, editorService, reference.link, this.configuration.openToSide, true);
+				}
+			} finally {
+				model.dispose();
+			}
 		} else {
 			const next = model.firstReference()!;
 			const peek = model.references.length > 1 && gotoLocation === 'gotoAndPeek';

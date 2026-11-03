@@ -1,0 +1,8 @@
+{
+	"displayName": "Git Info Exclude",
+	"description": "Local Git excludes and Explorer Git actions.",
+	"gitInfoExclude.addToExclude": "Add to Git Info Exclude",
+	"gitInfoExclude.discardChanges": "Discard Changes",
+	"gitInfoExclude.stageChanges": "Stage Changes",
+	"gitInfoExclude.addToGitignore": "Add to .gitignore"
+}

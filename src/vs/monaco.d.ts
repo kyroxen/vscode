@@ -4283,7 +4283,7 @@ declare namespace monaco.editor {
 		closeOnResult?: boolean;
 	}
 
-	export type GoToLocationValues = 'peek' | 'gotoAndPeek' | 'goto';
+	export type GoToLocationValues = 'peek' | 'gotoAndPeek' | 'goto' | 'pick';
 
 	/**
 	 * Configuration options for go to location
