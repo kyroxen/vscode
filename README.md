@@ -1,4 +1,4 @@
-# Cat-Code A Fork Of Visual Studio Code - Open Source ("Code - OSS")
+# CatCode: A Fork Of Visual Studio Code - Open Source ("Code - OSS")
 
 <p align="center">
   <img alt="Blue cat application icon for this fork" src="resources/intellij/cat-app.svg" width="128">
