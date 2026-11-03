@@ -1,6 +1,6 @@
-# VS Code Agents Instructions
+# CatCode Agents Instructions
 
-This file provides instructions for AI coding agents working with the VS Code codebase.
+This file provides instructions for AI coding agents working on CatCode, a fork of the VS Code codebase.
 
 For detailed project overview, architecture, coding guidelines, and validation steps, see the [Copilot Instructions](.github/copilot-instructions.md).
 
@@ -12,6 +12,13 @@ For detailed project overview, architecture, coding guidelines, and validation s
 - Preserve upstream defaults and APIs wherever possible. Prefer thin adapters over widening APIs or modifying shared implementations.
 - Let independent searches publish results independently; a slow provider must not block ready results from other sources.
 - Add focused regression coverage for changed behavior, run the relevant checks, and keep [the upstream sync guide](scripts/intellij/UPSTREAM-SYNC.md) current when integration points change.
+
+## Packaging and Product Identity
+
+- `product.json` owns the CatCode name through `nameShort` and `nameLong`. Rebuild the app, executable, helper bundles, and native menu together with `pnpm run gulp vscode-darwin-arm64`; editing `CFBundleName` on an existing bundle alone breaks Electron helper discovery.
+- Preserve the existing bundle identifier, application name, data-folder names, and URL protocol when changing visible branding. Follow the [profile upgrade notes](scripts/intellij/UPSTREAM-SYNC.md#fork-branding) for existing installations; preserve user data and explicit preferences.
+- The Apple Silicon build produces `../VSCode-darwin-arm64/CatCode.app`. Quit the installed app before replacing `/Applications/CatCode.app`. Source builds, installed bundles, and their profiles have separate update paths; Developer: Reload Window does not install a rebuilt bundle.
+- Keep the Copilot packaging repair in the fork-owned helper and its small build hook. Run the [packaging regression tests](scripts/intellij/copilotPackaging.test.ts) and a fresh packaging build after changing it; verify extension entry points, external runtime dependencies, and matching native SDK files without manual copies into generated output.
 
 ## Fork References
 

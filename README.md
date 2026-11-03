@@ -1,20 +1,20 @@
-# CatCode: A Fork Of Visual Studio Code - Open Source ("Code - OSS")
+# CatCode: A Fork of Visual Studio Code - Open Source ("Code - OSS")
 
 <p align="center">
   <img alt="Blue cat application icon for this fork" src="resources/intellij/cat-app.svg" width="128">
 </p>
 
-Compared with Microsoft's VS Code, this fork adds an Jetbrains-inspired experience for Java, Spring Boot, and JavaScript/TypeScript projects while retaining the Code - OSS foundation.
+Compared with Microsoft's VS Code, this fork adds a JetBrains-inspired experience for Java, Spring Boot, and JavaScript/TypeScript projects while retaining the Code - OSS foundation.
 
-* **Jetbrains-style navigation:** Cmd+click/Cmd+B, implementation navigation, and a custom usages popup backed by native language providers and editor-opening behavior.
+* **JetBrains-style navigation:** Cmd+click/Cmd+B, implementation navigation, and a custom usages popup backed by native language providers and editor-opening behavior.
 * **Categorized references:** separate, collapsible sections for implementations, production usages, tests, documentation, declarations, imports, configuration/resources, and unresolved references. Empty sections are omitted.
 * **Navigation popup:** file/path/source filtering, Current File scope, source snippets, code previews on hover, resizable popup and columns, stable positioning, section icons and count badges, darker result rows, and neutral selection colors.
 * **Dependency identification:** library/JDK source information through native tab decorations, breadcrumb labels where supported, and a persistent status-bar source entry. Original resource URIs and filenames are preserved.
 * **Search Everywhere and Go to Class:** combined file, symbol, and action results publish independently as providers respond. Class search uses native symbol resolution and opening handlers.
-* **Jetbrains keymaps:** shortcuts for navigation, usages, search, rename, formatting, and quick fixes, with explicit user bindings taking precedence.
+* **JetBrains keymaps:** shortcuts for navigation, usages, search, rename, formatting, and quick fixes, with explicit user bindings taking precedence.
 * **Isolated tooling setup:** provisions pinned, locally installed Java language, debugger, test, Maven, Gradle, and Spring Boot extensions, or JavaScript tooling including ESLint and Prettier, into a separate development profile. Extensions are copied from an existing installation rather than bundled or downloaded; versions live in the [setup manifest](scripts/intellij/extensions.json).
 * **JavaScript project tools:** nearest-package detection, monorepo-aware package scripts through native tasks, and access to debugging, testing, and configured formatting/linting integrations. Project detection does not execute scripts or silently install dependencies.
-* **Appearance and branding:** bundled Islands Dark theme, JetBrains icons, Jetbrains keymaps, and a blue cat application icon across desktop and web assets. General defaults are Dark Modern and Seti; Java workspaces automatically select Islands Dark and JetBrains icons when available; explicit user and workspace settings take precedence. The navigation popup retains its Islands palette across dark themes.
+* **Appearance and branding:** bundled Islands Dark theme, JetBrains icons, JetBrains keymaps, and a blue cat application icon across desktop and web assets. General defaults are Dark Modern and Seti; Java workspaces automatically select Islands Dark and JetBrains icons when available; explicit user and workspace settings take precedence. The navigation popup retains its Islands palette across dark themes.
 * **Explorer error underlines:** files with errors receive a themed red wavy underline while Git filename colors stay visible. Warning colors and problem count badges are hidden by default.
 * **Breadcrumb refinements:** minimal bottom padding and post-layout scrolling to keep the rightmost/current element visible while preserving keyboard navigation.
 * **Git convenience:** an Explorer New submenu backed by native file/folder creation, and a Git submenu with local excludes, stage/discard actions, and comparison against a branch, tag, or revision. See the [Git action guide](extensions/git-info-exclude/README.md).
@@ -23,7 +23,20 @@ Prepare the isolated development profile using the [setup and appearance guide](
 
 The fork ships theme-scoped color defaults for Dark Modern and Islands Dark: editor background `#18191C`, breadcrumb background `#222429`, and breadcrumb bottom border `#3A3D43`. Explicit user color settings take precedence. Automatic Java appearance uses window-local defaults, so new projects need no workspace override. Older profile theme/icon overrides can be reset once to enable automatic selection. Other personal settings in the ignored development profile remain local.
 
-Java language intelligence, debugging, Spring support, editor opening, and search providers continue to come from VS Code and its extensions. Deeper Java/Spring workflow polish, distributable packaging, and end-to-end validation against representative Spring applications remain a later phase.
+Java language intelligence, debugging, Spring support, editor opening, and search providers continue to come from VS Code and its extensions. Local Apple Silicon macOS builds are supported. Public release distribution, extension licensing review, deeper Java/Spring workflow polish, and end-to-end validation against representative Spring applications remain future work.
+
+## Build and Install on macOS
+
+Use the Node version in `.nvmrc` and the pnpm version pinned in `package.json`. From the repository root, run:
+
+```sh
+pnpm run install-fast
+pnpm run gulp vscode-darwin-arm64
+```
+
+The Apple Silicon build produces `../VSCode-darwin-arm64/CatCode.app`, including the fork extensions and built-in Copilot runtime dependencies. Quit any running CatCode instance, then copy the app into `/Applications`. Open **CatCode** from Finder, Spotlight, or the Dock; normal launches do not require a terminal or rebuild the source. Later source updates require a new build and replacement of the installed app; Developer: Reload Window does not update an installed bundle.
+
+The installed app uses `~/Library/Application Support/CatCode` for its profile and `~/.vscode-oss/extensions` for user extensions. The development launcher continues to use its isolated `.profile-oss/` profiles. See the [local installation and upgrade notes](scripts/intellij/UPSTREAM-SYNC.md#local-macos-installation) for profile setup and the [branding notes](scripts/intellij/UPSTREAM-SYNC.md#fork-branding) for upgrading an existing Code - OSS installation without losing its profile.
 
 [![Feature Requests](https://img.shields.io/github/issues/microsoft/vscode/feature-request.svg)](https://github.com/microsoft/vscode/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request+sort%3Areactions-%2B1-desc)
 [![Bugs](https://img.shields.io/github/issues/microsoft/vscode/bug.svg)](https://github.com/microsoft/vscode/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3Abug)

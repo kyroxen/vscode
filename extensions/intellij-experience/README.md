@@ -15,7 +15,7 @@ Setup reads the exact versions in `scripts/intellij/extensions.json` from `~/.vs
 
 The development profile lives under `.profile-oss/intellij/` and contains its own extensions, settings, keybindings, and shared storage. The launcher runs the repository's incremental source build before normal launch preparation. This first launch can download Electron and compile the workbench and built-in extensions. Subsequent launches reuse unchanged outputs.
 
-The extension stack includes Java language support, debugger, test runner, project management, Maven, Gradle, Spring Boot Tools, Initializr, and Boot Dashboard. Setup reuses locally installed copies; it does not enable an extension marketplace or implement distributable packaging. The source VS Code installation remains independent.
+The extension stack includes Java language support, debugger, test runner, project management, Maven, Gradle, Spring Boot Tools, Initializr, and Boot Dashboard. Setup reuses locally installed copies; it does not enable an extension marketplace. Local macOS app packaging is documented below; public distribution and extension licensing review remain separate work. The source VS Code installation remains independent.
 
 ## Installed macOS App
 
@@ -23,7 +23,7 @@ The packaged fork can be installed as `/Applications/CatCode.app` and launched f
 
 ## Refreshing a Running Development Instance
 
-After source edits, run `pnpm run build-fast --client-only`. For edits to existing client modules, use Cmd+Shift+A and select Developer: Reload Window. When a change adds or removes a CSS module, fully quit Code - OSS with Cmd+Q and relaunch with `./scripts/code-intellij.sh`. The development main process caches the CSS module import map; a window reload cannot refresh that cache. A stale map can produce a CSS MIME-type error and prevent the workbench from loading. The new navigation popup stylesheet requires this full restart the first time it is added.
+After source edits, run `pnpm run build-fast --client-only`. For edits to existing client modules, use Cmd+Shift+A and select Developer: Reload Window. When a change adds or removes a CSS module, fully quit CatCode with Cmd+Q and relaunch with `./scripts/code-intellij.sh`. The development main process caches the CSS module import map; a window reload cannot refresh that cache. A stale map can produce a CSS MIME-type error and prevent the workbench from loading. The new navigation popup stylesheet requires this full restart the first time it is added.
 
 ## Project Appearance
 

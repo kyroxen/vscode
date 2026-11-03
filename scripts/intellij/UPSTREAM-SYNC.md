@@ -113,7 +113,7 @@ Categorized usages supplement reference-provider results with definition and imp
 
 Finally, smoke-test a method call, its declaration, and an interface with multiple implementations: Cmd+click/Cmd+B, the usages popup, Cmd+Option+B, Escape, Enter, filtering, Current File, and Open Results. Verify that the back action restores the origin and that remote/dependency source locations still open. Check a narrow window and a high-contrast theme when popup layout or colors change.
 
-Fully quit and restart Code - OSS after adding or removing CSS modules. The development main process caches their import-map entries, so Developer: Reload Window alone can fail with a CSS MIME-type error even when the source build is current. Preserve this upstream loader behavior rather than adding a fork-specific loader workaround.
+Fully quit and restart CatCode after adding or removing CSS modules. The development main process caches their import-map entries, so Developer: Reload Window alone can fail with a CSS MIME-type error even when the source build is current. Preserve this upstream loader behavior rather than adding a fork-specific loader workaround.
 
 This structure limits merge conflicts but cannot guarantee conflict-free syncing. Changes to upstream navigation lifecycle, provider contracts, and Quick Access APIs still need review. The targeted tests are regression coverage, not a replacement for the separate Java/Spring end-to-end validation phase.
 
