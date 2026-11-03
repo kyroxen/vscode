@@ -69,7 +69,7 @@ Validate project detection with `pnpm exec tsc -p extensions/intellij-javascript
 
 ## Local macOS Installation
 
-A packaged Apple Silicon build lives at `../VSCode-darwin-arm64/Code - OSS.app` and can be copied to `/Applications/Code - OSS.app`. Launch that app from Finder, Spotlight, or the Dock without a terminal or a source build. It uses `~/Library/Application Support/Code - OSS` and `~/.vscode-oss/extensions`; seed those locations from the isolated IntelliJ profile for the first installation, preserving existing installed-app data on later updates. Source changes require rebuilding and replacing the installed app.
+A packaged Apple Silicon build lives at `../VSCode-darwin-arm64/CatCode.app` and can be copied to `/Applications/CatCode.app`. Launch that app from Finder, Spotlight, or the Dock without a terminal or a source build. It uses `~/Library/Application Support/CatCode` and `~/.vscode-oss/extensions`; seed those locations from the isolated IntelliJ profile for the first installation, preserving existing installed-app data on later updates. Source changes require rebuilding and replacing the installed app.
 
 Build with `pnpm run gulp vscode-darwin-arm64` using the Node version in `.nvmrc`. The task cleans and rebuilds the extension outputs and desktop bundle. Both fork extensions use the standard esbuild helper; their development entry points under `out/` become bundled entry points under `dist/` during packaging.
 
@@ -81,13 +81,15 @@ Validate the helper with `node --test scripts/intellij/copilotPackaging.test.ts`
 
 ### Fork Branding
 
+`product.json` owns the CatCode product name through `nameShort` and `nameLong`. Build the executable, helper bundles, native menu, and app bundle together through the standard packaging task; changing `CFBundleName` on an existing bundle alone breaks Electron helper discovery. Retain the existing bundle identifier, application name, data-folder names, and URL protocol for compatibility. A first local upgrade from Code - OSS can link `~/Library/Application Support/CatCode` to the existing `~/Library/Application Support/Code - OSS` directory so settings and state remain available.
+
 `resources/intellij/cat.svg` owns the blue cat artwork; `scripts/intellij/generate-icons.py` generates the white app tile, macOS ICNS, Windows ICO, Linux PNG, web favicon/PWA icons, workbench logo, Sessions open-in-editor logo, and four theme-specific empty-editor watermarks. Existing upstream asset paths remain unchanged, so packaging, welcome/onboarding screens, title bars, banners, and update prompts all reuse the fork icon without runtime hooks. File-association icons and the separate Sessions app identity are unchanged.
 
 After syncing, retain the generated cat assets at `resources/darwin/code.icns`, `resources/win32/code.ico`, `resources/linux/code.png`, `resources/server/{favicon.ico,code-192.png,code-512.png}`, `src/vs/workbench/browser/media/code-icon.svg`, `src/vs/sessions/browser/media/vscode-icon.svg`, and `src/vs/workbench/browser/parts/editor/media/letterpress-{light,dark,hcLight,hcDark}.svg`. Check for new upstream app-logo consumers and wire them into the generator rather than copying artwork by hand.
 
 Run `uv run scripts/intellij/generate-icons.py` to regenerate and add `--check` to verify all generated assets match the source. CairoSVG requires the native Cairo library; on Homebrew macOS, use `DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib uv run scripts/intellij/generate-icons.py --check` if Cairo is not found automatically. Python dependencies are pinned in the script; these tools are only needed when regenerating or verifying artwork, not when building or running the editor.
 
-Electron downloads and packaged builds read the existing platform asset paths. A development Electron bundle downloaded before the icon changed must be refreshed separately: copy `resources/darwin/code.icns` to `.build/electron/Code - OSS.app/Contents/Resources/Code - OSS.icns`, then fully quit and reopen the app. macOS may retain its previous Dock icon until the app restarts.
+Electron downloads and packaged builds read the existing platform asset paths. A development Electron bundle downloaded before the icon changed must be refreshed separately: copy `resources/darwin/code.icns` to `.build/electron/CatCode.app/Contents/Resources/CatCode.icns`, then fully quit and reopen the app. macOS may retain its previous Dock icon until the app restarts.
 
 ### Updating From Upstream
 

@@ -19,7 +19,7 @@ The extension stack includes Java language support, debugger, test runner, proje
 
 ## Installed macOS App
 
-The packaged fork can be installed as `/Applications/Code - OSS.app` and launched from Finder, Spotlight, or the Dock. Normal launches do not need a terminal or rebuild the source. It uses its own Code - OSS settings and extensions; the first local installation can copy the IntelliJ development profile into those locations. Later source changes require a new packaged build. Build the Apple Silicon app with `pnpm run gulp vscode-darwin-arm64`. See the [local installation notes](../../scripts/intellij/UPSTREAM-SYNC.md#local-macos-installation).
+The packaged fork can be installed as `/Applications/CatCode.app` and launched from Finder, Spotlight, or the Dock. Normal launches do not need a terminal or rebuild the source. It uses its own CatCode settings and extensions; the first local installation can copy the IntelliJ development profile into those locations. Later source changes require a new packaged build. Build the Apple Silicon app with `pnpm run gulp vscode-darwin-arm64`. See the [local installation notes](../../scripts/intellij/UPSTREAM-SYNC.md#local-macos-installation).
 
 ## Refreshing a Running Development Instance
 
