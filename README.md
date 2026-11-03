@@ -22,7 +22,7 @@ Compared with Microsoft's VS Code, this fork adds an IntelliJ-inspired experienc
 
 Prepare the isolated development profile using the [setup and appearance guide](extensions/intellij-experience/README.md). The [upstream sync guide](scripts/intellij/UPSTREAM-SYNC.md) documents fork-owned modules, the small upstream integration points, branding regeneration, and regression checks.
 
-Personal editor/background colors, breadcrumb borders, and project-specific appearance overrides are configuration, separate from the shipped fork features. The current darker editor backgrounds live in the ignored development profile and do not automatically transfer to a fresh profile.
+The fork ships theme-scoped color defaults for Dark Modern and Islands Dark: editor background `#18191C`, breadcrumb background `#222429`, and breadcrumb bottom border `#3A3D43`. Explicit user color settings take precedence. Java theme/icon selection uses per-project workspace settings; new Java projects need that override once. Other personal settings in the ignored development profile remain local.
 
 Java language intelligence, debugging, Spring support, editor opening, and search providers continue to come from VS Code and its extensions. Deeper Java/Spring workflow polish, distributable packaging, and end-to-end validation against representative Spring applications remain a later phase.
 

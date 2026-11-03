@@ -20,6 +20,18 @@
 		"configurationDefaults": {
 			"workbench.colorTheme": "Dark Modern",
 			"workbench.iconTheme": "vs-seti",
+			"workbench.colorCustomizations": {
+				"[Dark Modern]": {
+					"editor.background": "#18191C",
+					"breadcrumb.background": "#222429",
+					"editorGroupHeader.border": "#3A3D43"
+				},
+				"[IntelliJ Islands Dark]": {
+					"editor.background": "#18191C",
+					"breadcrumb.background": "#222429",
+					"editorGroupHeader.border": "#3A3D43"
+				}
+			},
 			"workbench.editor.enablePreview": false,
 			"workbench.editor.enablePreviewFromQuickOpen": false,
 			"editor.multiCursorModifier": "alt",

@@ -32,6 +32,8 @@ Java projects can select the bundled IntelliJ appearance using native workspace 
 }
 ```
 
+Both Dark Modern and Islands Dark ship editor background `#18191C`, breadcrumb background `#222429`, and breadcrumb bottom border `#3A3D43` as theme-scoped defaults. Explicit user color preferences take precedence.
+
 Projects without these overrides use Dark Modern and Seti. Opening another project window applies that project's settings; appearance does not change when switching individual source files. New Java projects need the workspace override once. Explicit user and workspace preferences continue to take precedence over the fork defaults.
 
 ## Navigation and Keyboard Behavior

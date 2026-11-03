@@ -48,6 +48,19 @@ test('setup isolates extensions and preserves user settings and keybindings acro
 	});
 });
 
+test('setup provisions the shared theme colors and preserves explicit user color overrides', async t => {
+	const options = await fixture(t);
+	await setupIntelliJ(options);
+	const settingsFile = path.join(options.profile, 'user-data', 'User', 'settings.json');
+	const settings = parse(await readFile(settingsFile, 'utf8'));
+	const colors = { 'editor.background': '#18191C', 'breadcrumb.background': '#222429', 'editorGroupHeader.border': '#3A3D43' };
+	assert.deepStrictEqual(settings['workbench.colorCustomizations'], { '[Dark Modern]': colors, '[IntelliJ Islands Dark]': colors });
+	settings['workbench.colorCustomizations']['[Dark Modern]']['editor.background'] = '#123456';
+	await writeFile(settingsFile, JSON.stringify(settings));
+	await setupIntelliJ(options);
+	assert.strictEqual(parse(await readFile(settingsFile, 'utf8'))['workbench.colorCustomizations']['[Dark Modern]']['editor.background'], '#123456');
+});
+
 test('setup rejects missing pinned tooling before creating the profile', async t => {
 	const options = await fixture(t);
 	options.versions['missing.java'] = '1.0.0';

@@ -36,9 +36,11 @@ interface Keybinding {
 	when?: string;
 }
 
+type PreferenceValue = string | boolean | { [key: string]: PreferenceValue };
+
 interface Preferences {
 	contributes: {
-		configurationDefaults: Record<string, string | boolean | Record<string, string>>;
+		configurationDefaults: Record<string, PreferenceValue>;
 		keybindings: Keybinding[];
 	};
 }
