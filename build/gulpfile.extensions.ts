@@ -24,6 +24,7 @@ import { getCompilerOptionsFromTsConfig } from './lib/tsconfigUtils.ts';
 import * as util from './lib/util.ts';
 import watcher from './lib/watch/index.ts';
 import { BuildLifecycle } from './lib/buildEvents.ts';
+import { restoreCopilotPackaging } from '../scripts/intellij/copilotPackaging.ts';
 
 const root = path.dirname(import.meta.dirname);
 const commit = getVersion(root);
@@ -51,6 +52,7 @@ const compilations = [
 	'extensions/extension-editing/tsconfig.json',
 	'extensions/git/tsconfig.json',
 	'extensions/git-base/tsconfig.json',
+	'extensions/git-info-exclude/tsconfig.json',
 	'extensions/github/tsconfig.json',
 	'extensions/github-authentication/tsconfig.json',
 	'extensions/grunt/tsconfig.json',
@@ -280,7 +282,10 @@ task.task(compileNativeExtensionsBuildTask);
  * Compiles the built-in copilot extension for the build.
  * Used by non-CI local builds where copilot is not downloaded as a VSIX.
  */
-export const compileCopilotExtensionBuildTask = task.define('compile-copilot-extension-build', () => ext.packageCopilotExtensionStream().pipe(gulp.dest('.build')));
+export const compileCopilotExtensionBuildTask = task.define('compile-copilot-extension-build', task.series(
+	() => ext.packageCopilotExtensionStream().pipe(gulp.dest('.build')),
+	() => restoreCopilotPackaging(root),
+));
 task.task(compileCopilotExtensionBuildTask);
 
 /**

@@ -4,10 +4,10 @@ Keep the IntelliJ implementation additive: new modules own the UI and behavior; 
 
 ## Fork-Owned Code
 
-- `extensions/git-info-exclude/`: Explorer Git submenu including branch/revision comparison, Git context menus and original extension attribution; command implementation and literal ignore-pattern helpers live in `extensions/git/src/intellij/`, with coverage in `extensions/git/src/test/gitInfoExclude.test.ts`.
+- `extensions/git-info-exclude/`: an empty TypeScript activation entry point and esbuild bundle satisfy command-manifest packaging validation; Explorer Git submenu including branch/revision comparison, Git context menus and original extension attribution; command implementation and literal ignore-pattern helpers live in `extensions/git/src/intellij/`, with coverage in `extensions/git/src/test/gitInfoExclude.test.ts`.
 - `extensions/intellij-experience/`: appearance defaults, local theme, and keybindings.
-- `extensions/intellij-javascript/`: active-package detection, project tools, and native command adapters. Detection reads package metadata and configuration filenames without executing project code or changing workspace settings.
-- `scripts/intellij/` and `scripts/code-intellij.sh`: local extension provisioning, runtime detection, and development launch.
+- `extensions/intellij-javascript/`: an esbuild entry point produces the packaged `dist/extension.js`; active-package detection, project tools, and native command adapters. Detection reads package metadata and configuration filenames without executing project code or changing workspace settings.
+- `scripts/intellij/` and `scripts/code-intellij.sh`: local extension provisioning, runtime detection, and development launch. `copilotPackaging.ts` restores the built-in extension’s pinned SDK and external runtime packages after the standard Copilot build; `copilotPackaging.test.ts` covers dependency resolution, isolation, and missing SDK failures.
 - `src/vs/editor/contrib/gotoSymbol/browser/intellij/`: the anchored navigation popup, its renderer, keyboard interaction, and styles.
 - `src/vs/workbench/browser/parts/editor/intellij/breadcrumbsTail.ts`: cancellable post-layout scheduling for the native rightmost breadcrumb reveal.
 - `src/vs/editor/contrib/gotoSymbol/browser/symbolNavigationPicker.ts`: popup adapter with a standard Quick Pick fallback for hosts without an editor anchor.
@@ -23,7 +23,7 @@ These ten existing code files are the upstream behavior integration surface. Bra
 | `src/vs/workbench/contrib/files/browser/fileActions.contribution.ts` | Register native New File / New Folder actions under the fork-owned `explorerNewMenu` instead of directly in Explorer; allow file contexts as well as folders | Native writable preconditions, inline creation, validation, remote resources, and keyboard actions remain intact. No duplicate top-level creation entries. |
 | `extensions/git/src/main.ts` | Import and register the fork Git actions | Native repository resolution, stage conflict handling, discard confirmation, and disposal remain intact. Local excludes use `dotGit.commonPath ?? dotGit.path` for linked worktrees. |
 | `build/lib/i18n.resources.json` | One localization entry | Strings in the separate IntelliJ workbench contribution remain discoverable. |
-| `build/gulpfile.extensions.ts` | One compilation-list entry for `intellij-javascript` | Standard extension compilation, transpilation, and packaging include the fork-owned extension. |
+| `build/gulpfile.extensions.ts` | Compilation-list entries for `intellij-javascript` and `git-info-exclude`, plus a post-build call to `restoreCopilotPackaging` | Standard extension compilation, transpilation, and packaging include both fork-owned extensions. The Copilot build restores its pinned SDK and external runtime dependencies before native packaging; agent-host exclusions remain unchanged. |
 | `src/vs/workbench/workbench.common.main.ts` | One side-effect import | The IntelliJ contribution registers once in every supported workbench window. |
 | `src/vs/editor/common/config/editorOptions.ts` | Add `pick` to navigation preference validation and descriptions | Upstream has not changed option validation or introduced an equivalent choice. Default behavior for other configurations is unchanged. |
 | `src/vs/monaco.d.ts` | Add `pick` to the public navigation preference union | This declaration agrees with the editor's option type. |
@@ -66,6 +66,16 @@ The JavaScript Project status entry follows the active file's nearest package, r
 Reference categories recognize JS/TS test/spec filenames, `__tests__`, CommonJS bindings, and multiline imports/re-exports. JSDoc classification uses native language tokens and falls back when tokenization is unavailable. npm source labels recognize nested/scoped `node_modules` paths and pnpm versions before workspace membership, preserving original resource URIs. Yarn Plug'n'Play archives and symlink targets without package paths retain generic source labels.
 
 Validate project detection with `pnpm exec tsc -p extensions/intellij-javascript/tsconfig.json` and `pnpm exec mocha --ui tdd extensions/intellij-javascript/out/test/project.test.js`, plus setup and browser tests below. The extension-host suite at `extensions/intellij-javascript/out/test` additionally validates native task objects and remote package matching through `--extensionDevelopmentPath=extensions/intellij-javascript --extensionTestsPath=extensions/intellij-javascript/out/test`. Smoke-test JS/JSX, TS/TSX, CommonJS, monorepos, and mixed Java/JavaScript workspaces. Check symbol search, aliases, cross-file rename/references, source labels, formatter configuration, script execution, test integration availability, and Node/browser debugging. Missing dependencies and missing integrations must remain visible and actionable.
+
+## Local macOS Installation
+
+A packaged Apple Silicon build lives at `../VSCode-darwin-arm64/Code - OSS.app` and can be copied to `/Applications/Code - OSS.app`. Launch that app from Finder, Spotlight, or the Dock without a terminal or a source build. It uses `~/Library/Application Support/Code - OSS` and `~/.vscode-oss/extensions`; seed those locations from the isolated IntelliJ profile for the first installation, preserving existing installed-app data on later updates. Source changes require rebuilding and replacing the installed app.
+
+Build with `pnpm run gulp vscode-darwin-arm64` using the Node version in `.nvmrc`. The task cleans and rebuilds the extension outputs and desktop bundle. Both fork extensions use the standard esbuild helper; their development entry points under `out/` become bundled entry points under `dist/` during packaging.
+
+The shared module-ignore rules exclude the standalone `@github/copilot` package for the agent host, while the built-in Copilot extension still requires its separately pinned SDK. The small post-build hook in `build/gulpfile.extensions.ts` calls the fork-owned `restoreCopilotPackaging` helper after the existing Copilot build. It restores the extension’s own `package.json`, license, and SDK into `.build/extensions/copilot/node_modules/@github/copilot/`, plus `source-map-support`, `dotenv`, and their runtime dependencies, which the production bundle externalizes despite their development-dependency classification. Dependency resolution preserves nested versions. Missing required files fail the build. Upstream packaging continues to own version-matched native binaries and ripgrep; the agent-host exclusions and SDK are unchanged. If upstream removes the need for these files or fixes local extension packaging, remove or adapt the helper and its hook together.
+
+Validate the helper with `node --test scripts/intellij/copilotPackaging.test.ts` and run the full packaging task after changing it. No manual copies into the generated bundle or installed app are required.
 
 ## Sync Procedure
 

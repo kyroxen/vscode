@@ -17,6 +17,10 @@ The development profile lives under `.profile-oss/intellij/` and contains its ow
 
 The extension stack includes Java language support, debugger, test runner, project management, Maven, Gradle, Spring Boot Tools, Initializr, and Boot Dashboard. Setup reuses locally installed copies; it does not enable an extension marketplace or implement distributable packaging. The source VS Code installation remains independent.
 
+## Installed macOS App
+
+The packaged fork can be installed as `/Applications/Code - OSS.app` and launched from Finder, Spotlight, or the Dock. Normal launches do not need a terminal or rebuild the source. It uses its own Code - OSS settings and extensions; the first local installation can copy the IntelliJ development profile into those locations. Later source changes require a new packaged build. Build the Apple Silicon app with `pnpm run gulp vscode-darwin-arm64`. See the [local installation notes](../../scripts/intellij/UPSTREAM-SYNC.md#local-macos-installation).
+
 ## Refreshing a Running Development Instance
 
 After source edits, run `pnpm run build-fast --client-only`. For edits to existing client modules, use Cmd+Shift+A and select Developer: Reload Window. When a change adds or removes a CSS module, fully quit Code - OSS with Cmd+Q and relaunch with `./scripts/code-intellij.sh`. The development main process caches the CSS module import map; a window reload cannot refresh that cache. A stale map can produce a CSS MIME-type error and prevent the workbench from loading. The new navigation popup stylesheet requires this full restart the first time it is added.
