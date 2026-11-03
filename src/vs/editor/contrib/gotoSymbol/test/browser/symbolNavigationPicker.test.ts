@@ -117,4 +117,26 @@ suite('Symbol Navigation Picker', () => {
 			definitions: 'pick', implementations: 'pick', references: 'peek'
 		});
 	});
+
+	test('identifies nested, scoped, remote, and pnpm npm dependencies ahead of workspace membership', () => {
+		const cases = [
+			'file:///repo/node_modules/react/index.js',
+			'file:///repo/node_modules/@types/react/index.d.ts',
+			'file:///repo/node_modules/outer/node_modules/inner/index.js',
+			'file:///repo/node_modules/.pnpm/react@19.1.0/node_modules/react/index.js',
+			'vscode-remote://ssh-remote+host/repo/node_modules/.pnpm/@scope+lib@2.0.0_react@19/node_modules/@scope/lib/index.d.ts',
+			'file:///repo/packages/app/src/index.ts'
+		];
+		assert.deepStrictEqual(cases.map(uri => {
+			const origin = sourceOrigin(URI.parse(uri), true);
+			return [origin.kind, origin.detail, origin.packageName];
+		}), [
+			['library', 'react', 'react'],
+			['library', '@types/react', '@types/react'],
+			['library', 'inner', 'inner'],
+			['library', 'react · 19.1.0', 'react'],
+			['library', '@scope/lib · 2.0.0', '@scope/lib'],
+			['workspace', undefined, undefined]
+		]);
+	});
 });

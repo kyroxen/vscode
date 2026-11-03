@@ -18,14 +18,42 @@
 			"path": "./themes/intellij-islands-dark-color-theme.json"
 		}],
 		"configurationDefaults": {
-			"workbench.colorTheme": "IntelliJ Islands Dark",
-			"workbench.iconTheme": "vsc-jetbrains-icons-enhanced",
+			"workbench.colorTheme": "Dark Modern",
+			"workbench.iconTheme": "vs-seti",
 			"workbench.editor.enablePreview": false,
 			"workbench.editor.enablePreviewFromQuickOpen": false,
 			"editor.multiCursorModifier": "alt",
 			"editor.definitionLinkOpensInPeek": false,
 			"breadcrumbs.enabled": true,
 			"search.quickOpen.includeSymbols": true,
+			"[javascript]": {
+				"editor.gotoLocation.multipleDefinitions": "pick",
+				"editor.gotoLocation.multipleDeclarations": "pick",
+				"editor.gotoLocation.multipleTypeDefinitions": "pick",
+				"editor.gotoLocation.multipleImplementations": "pick",
+				"editor.gotoLocation.multipleReferences": "pick"
+			},
+			"[javascriptreact]": {
+				"editor.gotoLocation.multipleDefinitions": "pick",
+				"editor.gotoLocation.multipleDeclarations": "pick",
+				"editor.gotoLocation.multipleTypeDefinitions": "pick",
+				"editor.gotoLocation.multipleImplementations": "pick",
+				"editor.gotoLocation.multipleReferences": "pick"
+			},
+			"[typescript]": {
+				"editor.gotoLocation.multipleDefinitions": "pick",
+				"editor.gotoLocation.multipleDeclarations": "pick",
+				"editor.gotoLocation.multipleTypeDefinitions": "pick",
+				"editor.gotoLocation.multipleImplementations": "pick",
+				"editor.gotoLocation.multipleReferences": "pick"
+			},
+			"[typescriptreact]": {
+				"editor.gotoLocation.multipleDefinitions": "pick",
+				"editor.gotoLocation.multipleDeclarations": "pick",
+				"editor.gotoLocation.multipleTypeDefinitions": "pick",
+				"editor.gotoLocation.multipleImplementations": "pick",
+				"editor.gotoLocation.multipleReferences": "pick"
+			},
 			"[java]": {
 				"editor.gotoLocation.multipleDefinitions": "pick",
 				"editor.gotoLocation.multipleDeclarations": "pick",
@@ -48,6 +76,11 @@
 			"mac": "cmd+o",
 			"command": "intellij.goToClass",
 			"when": "!terminalFocus && !inputFocus"
+		}, {
+			"key": "ctrl+n",
+			"mac": "cmd+o",
+			"command": "workbench.action.showAllSymbols",
+			"when": "!terminalFocus && !inputFocus && editorLangId =~ /^(javascript|javascriptreact|typescript|typescriptreact)$/"
 		}, {
 			"key": "ctrl+alt+shift+n",
 			"mac": "cmd+alt+o",

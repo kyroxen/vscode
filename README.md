@@ -6,15 +6,25 @@
   <img alt="Blue cat application icon for this fork" src="resources/intellij/cat-app.svg" width="128">
 </p>
 
-This fork keeps the Code - OSS foundation and adds an IntelliJ-inspired experience for Java and Spring Boot development:
+Compared with Microsoft's VS Code, this fork adds an IntelliJ-inspired experience for Java, Spring Boot, and JavaScript/TypeScript projects while retaining the Code - OSS foundation.
 
-* **Fork icon and branding:** blue cat application icon across desktop and web assets, with source assets and regeneration steps in [the sync guide](scripts/intellij/UPSTREAM-SYNC.md).
-* **IntelliJ appearance:** `IntelliJ Islands Dark` theme and JetBrains-inspired keybindings from the [IntelliJ Experience extension](extensions/intellij-experience/README.md).
-* **Java and Spring Boot setup:** versioned Java language, debugger, test, Maven, Gradle, Spring Boot Tools, Initializr, and Dashboard extensions in [the setup manifest](scripts/intellij/extensions.json). Setup copies them from a local VS Code extensions directory into a separate profile; they are not bundled or downloaded.
-* **Navigation and search:** compact symbol navigation with categorized references, class search, and Search Everywhere for files, workspace symbols, and actions.
-* **Git convenience:** a fork extension for repository-specific Git info/exclude patterns.
+* **IntelliJ-style navigation:** Cmd+click/Cmd+B, implementation navigation, and a custom usages popup backed by native language providers and editor-opening behavior.
+* **Categorized references:** separate, collapsible sections for implementations, production usages, tests, documentation, declarations, imports, configuration/resources, and unresolved references. Empty sections are omitted.
+* **Navigation popup:** file/path/source filtering, Current File scope, source snippets, code previews on hover, resizable popup and columns, stable positioning, section icons and count badges, darker result rows, and neutral selection colors.
+* **Dependency identification:** library/JDK source information through native tab decorations, breadcrumb labels where supported, and a persistent status-bar source entry. Original resource URIs and filenames are preserved.
+* **Search Everywhere and Go to Class:** combined file, symbol, and action results publish independently as providers respond. Class search uses native symbol resolution and opening handlers.
+* **IntelliJ keymaps:** shortcuts for navigation, usages, search, rename, formatting, and quick fixes, with explicit user bindings taking precedence.
+* **Isolated tooling setup:** provisions pinned, locally installed Java language, debugger, test, Maven, Gradle, and Spring Boot extensions, or JavaScript tooling including ESLint and Prettier, into a separate development profile. Extensions are copied from an existing installation rather than bundled or downloaded; versions live in the [setup manifest](scripts/intellij/extensions.json).
+* **JavaScript project tools:** nearest-package detection, monorepo-aware package scripts through native tasks, and access to debugging, testing, and configured formatting/linting integrations. Project detection does not execute scripts or silently install dependencies.
+* **Appearance and branding:** bundled Islands Dark theme, JetBrains icons, IntelliJ keymaps, and a blue cat application icon across desktop and web assets. General defaults are Dark Modern and Seti; Java projects can select Islands Dark and JetBrains icons through native workspace settings. The navigation popup retains its Islands palette across dark themes.
+* **Breadcrumb refinements:** minimal bottom padding and post-layout scrolling to keep the rightmost/current element visible while preserving keyboard navigation.
+* **Git convenience:** additional repository context-menu actions, including local Git info/exclude support. See the [Git action guide](extensions/git-info-exclude/README.md).
 
-Prepare the separate development profile and launch this fork for a Java project using the [IntelliJ Experience setup guide](extensions/intellij-experience/README.md).
+Prepare the isolated development profile using the [setup and appearance guide](extensions/intellij-experience/README.md). The [upstream sync guide](scripts/intellij/UPSTREAM-SYNC.md) documents fork-owned modules, the small upstream integration points, branding regeneration, and regression checks.
+
+Personal editor/background colors, breadcrumb borders, and project-specific appearance overrides are configuration, separate from the shipped fork features. The current darker editor backgrounds live in the ignored development profile and do not automatically transfer to a fresh profile.
+
+Java language intelligence, debugging, Spring support, editor opening, and search providers continue to come from VS Code and its extensions. Deeper Java/Spring workflow polish, distributable packaging, and end-to-end validation against representative Spring applications remain a later phase.
 
 [![Feature Requests](https://img.shields.io/github/issues/microsoft/vscode/feature-request.svg)](https://github.com/microsoft/vscode/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request+sort%3Areactions-%2B1-desc)
 [![Bugs](https://img.shields.io/github/issues/microsoft/vscode/bug.svg)](https://github.com/microsoft/vscode/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3Abug)

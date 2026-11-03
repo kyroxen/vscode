@@ -1,0 +1,11 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/* Keep native breadcrumb geometry; reserve a little breathing room below its text. */
+.monaco-workbench .part.editor .breadcrumbs-control .monaco-breadcrumbs,
+.monaco-workbench .part.editor .breadcrumbs-control > .breadcrumbs-editor-type {
+	box-sizing: border-box;
+	padding-bottom: var(--vscode-spacing-size20);
+}

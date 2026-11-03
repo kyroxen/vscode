@@ -11,5 +11,7 @@
 	"vscjava.vscode-spring-boot-dashboard": "0.15.0",
 	"brennondenny.vsc-jetbrains-icons-enhanced": "2.3.0",
 	"vscjava.vscode-gradle": "3.18.1",
-	"vscjava.vscode-java-test": "0.47.0"
+	"vscjava.vscode-java-test": "0.47.0",
+	"dbaeumer.vscode-eslint": "3.0.34",
+	"esbenp.prettier-vscode": "12.4.0"
 }

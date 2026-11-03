@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { BreadcrumbsTail } from './intellij/breadcrumbsTail.js';
 import * as dom from '../../../../base/browser/dom.js';
 import { StandardMouseEvent } from '../../../../base/browser/mouseEvent.js';
 import { PixelRatio } from '../../../../base/browser/pixelRatio.js';
@@ -283,6 +284,7 @@ export class BreadcrumbsControl {
 	private readonly _breadcrumbsDisposables = new DisposableStore();
 	private readonly _labels: ResourceLabels;
 	private readonly _model = new MutableDisposable<BreadcrumbsModel>();
+	private readonly _tail: BreadcrumbsTail;
 	private _breadcrumbsPickerShowing = false;
 	private _breadcrumbsPickerIgnoreOnceItem: BreadcrumbsItem | undefined;
 
@@ -335,6 +337,7 @@ export class BreadcrumbsControl {
 			separatorIcon,
 			styles
 		);
+		this._tail = this._disposables.add(new BreadcrumbsTail(this._widget, dom.getWindow(this.domNode), () => !this._breadcrumbsPickerShowing && !this.isHidden()));
 		this._widget.onDidSelectItem(this._onSelectEvent, this, this._disposables);
 		this._widget.onDidFocusItem(this._onFocusEvent, this, this._disposables);
 		this._widget.onDidChangeFocus(this._updateCkBreadcrumbsActive, this, this._disposables);
@@ -393,6 +396,7 @@ export class BreadcrumbsControl {
 			dim = new dom.Dimension(Math.max(0, dim.width - editorTypeWidth), dim.height);
 		}
 		this._widget.layout(dim);
+		this._tail.layout();
 	}
 
 	isHidden(): boolean {

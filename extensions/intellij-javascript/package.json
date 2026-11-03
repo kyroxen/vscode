@@ -1,0 +1,22 @@
+{
+	"name": "intellij-javascript",
+	"displayName": "%displayName%",
+	"description": "%description%",
+	"version": "0.1.0",
+	"publisher": "vscode",
+	"license": "MIT",
+	"engines": { "vscode": "^1.146.0" },
+	"main": "./out/extension",
+	"activationEvents": ["onStartupFinished"],
+	"capabilities": {
+		"untrustedWorkspaces": { "supported": true },
+		"virtualWorkspaces": true
+	},
+	"contributes": {
+		"commands": [{
+			"command": "intellij.javascript.project",
+			"title": "%project.title%",
+			"category": "JavaScript"
+		}]
+	}
+}

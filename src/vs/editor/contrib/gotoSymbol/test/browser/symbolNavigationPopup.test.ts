@@ -130,6 +130,8 @@ suite('IntelliJ Symbol Navigation Popup', () => {
 			const root = host.querySelector<HTMLElement>('.intellij-symbol-popup')!;
 			root.style.setProperty('--vscode-editorWidget-foreground', '#ddd');
 			root.style.setProperty('--vscode-editorWidget-background', '#26282c');
+			root.style.setProperty('--vscode-editorGroupHeader-tabsBackground', '#181818');
+			assert.strictEqual(dom.getWindow(root).getComputedStyle(host.querySelector<HTMLElement>('.intellij-symbol-popup-header')!).backgroundColor, 'rgb(38, 40, 44)');
 			root.style.setProperty('--vscode-editor-background', '#191a1c');
 			root.style.setProperty('--vscode-spacing-size120', '12px');
 			root.style.setProperty('--vscode-strokeThickness', '1px');
@@ -146,18 +148,20 @@ suite('IntelliJ Symbol Navigation Popup', () => {
 			assert.notStrictEqual(dom.getWindow(root).getComputedStyle(header).backgroundColor, dom.getWindow(root).getComputedStyle(root).backgroundColor);
 			assert.strictEqual(dom.getWindow(root).getComputedStyle(leaf.querySelector<HTMLElement>('.intellij-symbol-popup-code')!).fontSize, `${editor.getOption(EditorOption.fontInfo).fontSize}px`);
 			const snippetStyle = leaf.querySelector<HTMLElement>('.intellij-symbol-popup-code')!.style;
-			assert.strictEqual(snippetStyle.letterSpacing, `${editor.getOption(EditorOption.fontInfo).letterSpacing}px`);
-			assert.notStrictEqual(snippetStyle.fontFeatureSettings, '');
+			assert.strictEqual(snippetStyle.letterSpacing, '');
+			assert.strictEqual(snippetStyle.fontFeatureSettings, '');
+			assert.strictEqual(snippetStyle.lineHeight, '');
 			root.style.setProperty('--vscode-list-activeSelectionBackground', '#005500');
 			root.style.setProperty('--vscode-list-focusAndSelectionOutline', '#ff00ff');
 			const list = host.querySelector<HTMLElement>('.monaco-list')!;
 			const listRow = leaf.closest<HTMLElement>('.monaco-list-row')!;
 			list.focus();
-			assert.strictEqual(dom.getWindow(root).getComputedStyle(listRow).backgroundColor, 'rgb(0, 85, 0)');
-			assert.strictEqual(dom.getWindow(root).getComputedStyle(listRow).outlineColor, 'rgb(255, 0, 255)');
+			assert.notStrictEqual(dom.getWindow(root).getComputedStyle(listRow).backgroundColor, 'rgb(0, 85, 0)');
+			assert.notStrictEqual(dom.getWindow(root).getComputedStyle(listRow).outlineColor, 'rgb(255, 0, 255)');
 			host.querySelector<HTMLInputElement>('input')!.focus();
 			const group = host.querySelector<HTMLElement>('.intellij-symbol-popup-file-group')!;
 			assert.strictEqual(dom.getWindow(root).getComputedStyle(group).borderTopWidth, '1px');
+			assert.notStrictEqual(dom.getWindow(root).getComputedStyle(group).borderTopColor, 'rgb(255, 0, 255)');
 			assert.strictEqual(dom.getWindow(root).getComputedStyle(group).backgroundColor, 'rgba(0, 0, 0, 0)');
 			assert.strictEqual(dom.getWindow(root).getComputedStyle(leaf).backgroundColor, 'rgb(25, 26, 28)');
 			assert.strictEqual(dom.getWindow(root).getComputedStyle(leaf.closest<HTMLElement>('.monaco-list-row')!).backgroundColor, 'rgba(0, 0, 0, 0)');
@@ -167,6 +171,7 @@ suite('IntelliJ Symbol Navigation Popup', () => {
 			assert.strictEqual(typeof hover, 'function');
 			const preview = (hover as () => HTMLElement)();
 			assert.strictEqual(preview.querySelectorAll('pre > div').length, 2);
+			assert.strictEqual(preview.querySelector('.intellij-symbol-popup-preview-title')?.textContent, '/project/Api.java:1');
 			assert.ok(preview.querySelector('.match')!.textContent?.includes('service.run();'));
 			const nativeDelegate = getDefaultHoverDelegate('element');
 			const originalShow = nativeDelegate.showHover;
@@ -181,6 +186,34 @@ suite('IntelliJ Symbol Navigation Popup', () => {
 			key(host.querySelector<HTMLInputElement>('input')!, 'Escape', 27);
 			await result;
 			assert.strictEqual(hovers.size, 0);
+		});
+	});
+
+	test('keeps Islands popup surfaces under Dark Modern without recoloring the editor or light themes', async () => {
+		await withAsyncTestCodeEditor('void run() {}', {}, async (editor, _view, instantiationService) => {
+			const { popup, host, hovers } = createPopup(editor, instantiationService);
+			host.classList.add('vs-dark');
+			host.style.setProperty('--vscode-editorWidget-background', '#202020');
+			host.style.setProperty('--vscode-editor-background', '#1f1f1f');
+			host.style.setProperty('--vscode-input-background', '#313131');
+			const result = popup.show();
+			await timeout(0);
+			const color = (selector: string) => dom.getWindow(host).getComputedStyle(host.querySelector<HTMLElement>(selector)!).backgroundColor;
+			assert.strictEqual(color('.intellij-symbol-popup'), 'rgb(38, 40, 44)');
+			assert.strictEqual(color('.intellij-symbol-popup-header'), 'rgb(38, 40, 44)');
+			assert.strictEqual(color('.intellij-symbol-popup-filter'), 'rgb(33, 35, 38)');
+			assert.strictEqual(color('.intellij-symbol-popup-columns'), 'rgb(25, 26, 28)');
+			const leaf = host.querySelector<HTMLElement>('.intellij-symbol-popup-row:not(.intellij-symbol-popup-file-group)')!;
+			assert.strictEqual(dom.getWindow(host).getComputedStyle(leaf).backgroundColor, 'rgb(25, 26, 28)');
+			assert.strictEqual(host.style.getPropertyValue('--vscode-editor-background'), '#1f1f1f');
+			const preview = (hovers.get(leaf) as () => HTMLElement)();
+			host.appendChild(preview);
+			assert.strictEqual(color('.intellij-symbol-popup-preview'), 'rgb(38, 40, 44)');
+			preview.remove();
+			host.classList.remove('vs-dark');
+			assert.strictEqual(color('.intellij-symbol-popup'), 'rgb(32, 32, 32)');
+			key(host.querySelector<HTMLInputElement>('input')!, 'Escape', 27);
+			await result;
 		});
 	});
 
@@ -314,17 +347,18 @@ suite('IntelliJ Symbol Navigation Popup', () => {
 			await timeout(0);
 			const rows = () => [...host.querySelectorAll('.intellij-symbol-popup-row:not(.intellij-symbol-popup-file-group)')].map(row => ({
 				file: row.querySelector('.intellij-symbol-popup-file')?.textContent,
-				origin: row.querySelector('.intellij-symbol-popup-origin')?.textContent,
+				origin: row.querySelector('.intellij-symbol-popup-origin'),
 				path: row.querySelector('.intellij-symbol-popup-path')?.textContent
 			}));
 			assert.deepStrictEqual(rows(), [
-				{ file: 'Service.java', origin: 'Workspace', path: '/project/src/Service.java' },
-				{ file: 'Service.java', origin: 'Library', path: 'legal-compliance-rules-lib · 3.4.38 · com.example' }
+				{ file: 'Service.java', origin: null, path: '/project/src/Service.java' },
+				{ file: 'Service.java', origin: null, path: '/legal-compliance-rules-lib-3.4.38.jar/com.example/Service.java' }
 			]);
 			const filter = host.querySelector<HTMLInputElement>('input')!;
 			filter.value = 'Library';
 			filter.dispatchEvent(new Event('input'));
-			assert.deepStrictEqual(rows().map(row => row.origin), ['Library']);
+			assert.strictEqual(rows().length, 1);
+			assert.ok(rows()[0].path?.includes('legal-compliance-rules-lib-3.4.38.jar'));
 			key(filter, 'Escape', 27);
 			await result;
 		});

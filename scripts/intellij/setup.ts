@@ -11,6 +11,7 @@ import { parseArgs } from 'node:util';
 import { applyEdits, modify, parse, type ParseError } from 'jsonc-parser';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
+const profileVersion = 2;
 const readJSON = async <T>(file: string | URL): Promise<T> => JSON.parse(await readFile(file, 'utf8'));
 
 interface ExtensionManifest {
@@ -47,6 +48,17 @@ export interface SetupOptions {
 	profile: string;
 	versions: Record<string, string>;
 	javaCandidates?: string;
+	tooling?: Tooling;
+}
+
+export type Tooling = 'all' | 'java' | 'javascript';
+
+const commonExtensions = new Set(['k--kato.intellij-idea-keybindings', 'brennondenny.vsc-jetbrains-icons-enhanced']);
+const javascriptExtensions = new Set(['dbaeumer.vscode-eslint', 'esbenp.prettier-vscode']);
+
+/** Versions have one source of truth; language bundles only select extension IDs. */
+export function selectExtensions(versions: Record<string, string>, tooling: Tooling): Record<string, string> {
+	return Object.fromEntries(Object.entries(versions).filter(([id]) => tooling === 'all' || commonExtensions.has(id) || (tooling === 'javascript' ? javascriptExtensions.has(id) : !javascriptExtensions.has(id))));
 }
 
 function hasErrorCode(error: object, code: string): boolean {
@@ -75,7 +87,8 @@ async function readOptional(file: string, fallback: string): Promise<string> {
 	}
 }
 
-export async function setupIntelliJ({ source, profile, versions, javaCandidates = path.join(homedir(), '.sdkman', 'candidates', 'java') }: SetupOptions) {
+export async function setupIntelliJ({ source, profile, versions, tooling = 'all', javaCandidates = path.join(homedir(), '.sdkman', 'candidates', 'java') }: SetupOptions) {
+	versions = selectExtensions(versions, tooling);
 	source = await realpath(source);
 	profile = await canonicalPath(path.resolve(profile));
 	const extensionsDir = path.join(profile, 'extensions');
@@ -137,12 +150,12 @@ export async function setupIntelliJ({ source, profile, versions, javaCandidates 
 		throw new Error(`Fix invalid settings in ${settingsFile}, then rerun setup.`);
 	}
 	const runtimes: JavaRuntime[] = [];
-	for (const entry of await readdir(javaCandidates, { withFileTypes: true }).catch(error => {
+	for (const entry of await (tooling === 'javascript' ? Promise.resolve([]) : readdir(javaCandidates, { withFileTypes: true }).catch(error => {
 		if (!(error instanceof Error) || !hasErrorCode(error, 'ENOENT')) {
 			throw error;
 		}
 		return [];
-	})) {
+	}))) {
 		const major = Number(entry.name.match(/^(\d+)[.-]/)?.[1]);
 		const javaHome = path.join(javaCandidates, entry.name);
 		if (major >= 8 && (await stat(path.join(javaHome, 'bin', 'javac')).catch(() => undefined))?.isFile()) {
@@ -183,22 +196,37 @@ export async function setupIntelliJ({ source, profile, versions, javaCandidates 
 	for (const binding of [...preferences.contributes.keybindings].reverse()) {
 		const key = process.platform === 'darwin' ? binding.mac ?? binding.key : binding.key;
 		if (!existingKeybindings.some(existing => existing.key === key && existing.command === binding.command)) {
-			bindingsText = applyEdits(bindingsText, modify(bindingsText, [0], { key, command: binding.command, when: binding.when }, { isArrayInsertion: true, formattingOptions: { insertSpaces: false, tabSize: 4 } }));
+			// Older profiles already contain our broad Go to Class binding. Place
+			// the JS-specific override after it, while leaving later user choices last.
+			const current: Keybinding[] = parse(bindingsText);
+			const legacyClass = binding.command === 'workbench.action.showAllSymbols' && binding.when?.includes('editorLangId')
+				? current.findIndex(existing => existing.key === key && existing.command === 'intellij.goToClass' && existing.when === '!terminalFocus && !inputFocus') : -1;
+			bindingsText = applyEdits(bindingsText, modify(bindingsText, [legacyClass + 1], { key, command: binding.command, when: binding.when }, { isArrayInsertion: true, formattingOptions: { insertSpaces: false, tabSize: 4 } }));
 		}
 	}
 	await writeFile(keybindingsFile, bindingsText);
-	await writeFile(path.join(profile, 'tooling.json'), JSON.stringify({ installed, runtimes }, null, '\t') + '\n');
+	await writeFile(path.join(profile, 'tooling.json'), JSON.stringify({ profileVersion, tooling, installed, runtimes }, null, '\t') + '\n');
 	return { profile, extensionsDir, userDataDir: path.join(profile, 'user-data'), installed, runtimes };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-	const { values } = parseArgs({ options: { source: { type: 'string' }, profile: { type: 'string' }, help: { type: 'boolean' } } });
+	const { values } = parseArgs({ options: { source: { type: 'string' }, profile: { type: 'string' }, tooling: { type: 'string', default: 'all' }, check: { type: 'boolean' }, help: { type: 'boolean' } } });
 	if (values.help) {
-		console.log('Usage: node scripts/intellij/setup.ts [--source ~/.vscode/extensions] [--profile .profile-oss/intellij]\nCopies the pinned Java/Spring tooling into a separate development profile. Close that profile before rerunning.');
+		console.log('Usage: node scripts/intellij/setup.ts [--source ~/.vscode/extensions] [--profile .profile-oss/intellij] [--tooling all|java|javascript]\nCopies pinned tooling into a separate development profile. JavaScript includes ESLint and Prettier without requiring Java/Spring. Close that profile before rerunning.');
 	} else {
 		try {
-			const result = await setupIntelliJ({ source: values.source ?? path.join(homedir(), '.vscode', 'extensions'), profile: values.profile ?? path.join(root, '.profile-oss', 'intellij'), versions: await readJSON<Record<string, string>>(new URL('./extensions.json', import.meta.url)) });
-			console.log(JSON.stringify(result, null, '\t'));
+			if (values.tooling !== 'all' && values.tooling !== 'java' && values.tooling !== 'javascript') {
+				throw new Error('Choose --tooling all, java, or javascript.');
+			}
+			const profile = values.profile ?? path.join(root, '.profile-oss', values.tooling === 'all' ? 'intellij' : `intellij-${values.tooling}`);
+			const versions = await readJSON<Record<string, string>>(new URL('./extensions.json', import.meta.url));
+			if (values.check) {
+				const saved = JSON.parse(await readOptional(path.join(profile, 'tooling.json'), '{}')) as { profileVersion?: number; tooling?: Tooling; installed?: { id: string; version: string }[] };
+				process.exitCode = saved.profileVersion === profileVersion && saved.tooling === values.tooling && Object.entries(selectExtensions(versions, values.tooling)).every(([id, version]) => saved.installed?.some(installed => installed.id === id && installed.version === version)) ? 0 : 1;
+			} else {
+				const result = await setupIntelliJ({ source: values.source ?? path.join(homedir(), '.vscode', 'extensions'), profile, tooling: values.tooling, versions });
+				console.log(JSON.stringify(result, null, '\t'));
+			}
 		} catch (error) {
 			console.error(error instanceof Error ? error.message : String(error));
 			process.exitCode = 1;

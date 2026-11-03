@@ -18,6 +18,19 @@ export interface SourceOrigin {
 export function sourceOrigin(resource: URI, inWorkspace = false): SourceOrigin {
 	const segments = resource.path.split('/').filter(Boolean);
 	const archive = segments[0] ?? '';
+	// The innermost node_modules owns nested and pnpm dependency paths. Resolve
+	// origin before workspace membership: dependencies usually live in the workspace.
+	const modules = segments.lastIndexOf('node_modules');
+	const npmName = segments[modules + 1];
+	if ((resource.scheme === 'file' || resource.scheme === 'vscode-remote') && modules >= 0 && npmName && !npmName.startsWith('.')) {
+		const packageName = npmName.startsWith('@') && segments[modules + 2] ? `${npmName}/${segments[modules + 2]}` : npmName;
+		const store = segments[modules - 1];
+		const prefix = `${packageName.replace('/', '+')}@`;
+		const version = segments[modules - 2] === '.pnpm' && store.startsWith(prefix) ? store.slice(prefix.length).split(/[_\(]/)[0] : undefined;
+		const label = localize('librarySource', "Library");
+		const detail = version ? `${packageName} · ${version}` : packageName;
+		return { kind: 'library', label, detail, packageName, description: [label, detail, resource.path].join('\n') };
+	}
 	const isJava = resource.scheme === 'jdt' || resource.scheme === 'jrt';
 	const isJdk = resource.scheme === 'jrt' || (isJava && (/^(?:java|jdk)\.[\w.]+$/.test(archive) || archive === 'rt.jar'));
 	const isLibrary = isJava && !isJdk && /\.jar$/i.test(archive);

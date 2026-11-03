@@ -8,7 +8,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { test, type TestContext } from 'node:test';
-import { setupIntelliJ, type SetupOptions } from './setup.ts';
+import { setupIntelliJ, selectExtensions, type SetupOptions } from './setup.ts';
 import { parse } from 'jsonc-parser';
 
 async function fixture(t: TestContext): Promise<SetupOptions> {
@@ -66,6 +66,55 @@ test('setup adds new Java defaults to an existing language block without replaci
 	assert.deepStrictEqual({ comment: text.includes('// User language choices'), tabSize: java['editor.tabSize'], definitions: java['editor.gotoLocation.multipleDefinitions'], references: java['editor.gotoLocation.multipleReferences'] }, {
 		comment: true, tabSize: 2, definitions: 'goto', references: 'pick'
 	});
+});
+
+test('setup preserves JavaScript overrides and adds navigation defaults for all JS and TS languages', async t => {
+	const options = await fixture(t);
+	const user = path.join(options.profile, 'user-data', 'User');
+	await mkdir(user, { recursive: true });
+	await writeFile(path.join(user, 'settings.json'), JSON.stringify({ '[javascript]': { 'editor.gotoLocation.multipleReferences': 'peek', 'editor.defaultFormatter': 'custom.formatter' } }));
+	await setupIntelliJ(options);
+	const settings = parse(await readFile(path.join(user, 'settings.json'), 'utf8'));
+	assert.deepStrictEqual(['javascript', 'javascriptreact', 'typescript', 'typescriptreact'].map(language => settings[`[${language}]`]), [
+		{ ...settings['[javascriptreact]'], 'editor.gotoLocation.multipleReferences': 'peek', 'editor.defaultFormatter': 'custom.formatter' },
+		settings['[java]'], settings['[java]'], settings['[java]']
+	]);
+	const bindings = JSON.parse(await readFile(path.join(user, 'keybindings.json'), 'utf8'));
+	assert.ok(bindings.some((binding: { command: string; when: string }) => binding.command === 'workbench.action.showAllSymbols' && binding.when.includes('javascriptreact')));
+});
+
+test('language bundles share appearance tooling without requiring the other language tools', async t => {
+	const versions = { 'k--kato.intellij-idea-keybindings': '1', 'redhat.java': '2', 'dbaeumer.vscode-eslint': '3', 'esbenp.prettier-vscode': '4' };
+	assert.deepStrictEqual([
+		selectExtensions(versions, 'javascript'), selectExtensions(versions, 'java'), selectExtensions(versions, 'all')
+	], [
+		{ 'k--kato.intellij-idea-keybindings': '1', 'dbaeumer.vscode-eslint': '3', 'esbenp.prettier-vscode': '4' },
+		{ 'k--kato.intellij-idea-keybindings': '1', 'redhat.java': '2' }, versions
+	]);
+	const options = await fixture(t);
+	options.tooling = 'javascript';
+	// There is deliberately no Java installation in this fixture.
+	options.versions = {};
+	const result = await setupIntelliJ(options);
+	assert.deepStrictEqual({ installed: result.installed, runtimes: result.runtimes }, { installed: [], runtimes: [] });
+});
+
+test('existing profiles receive the JS shortcut after the old class binding and before user overrides', async t => {
+	const options = await fixture(t);
+	const user = path.join(options.profile, 'user-data', 'User');
+	await mkdir(user, { recursive: true });
+	const key = process.platform === 'darwin' ? 'cmd+o' : 'ctrl+n';
+	await writeFile(path.join(user, 'keybindings.json'), JSON.stringify([
+		{ key, command: 'intellij.goToClass', when: '!terminalFocus && !inputFocus' },
+		{ key, command: 'user.open', when: 'custom.context' }
+	]));
+	await setupIntelliJ(options);
+	const bindings = await readFile(path.join(user, 'keybindings.json'), 'utf8');
+	assert.deepStrictEqual(JSON.parse(bindings).filter((binding: { key: string }) => binding.key === key).map((binding: { command: string }) => binding.command), [
+		'intellij.goToClass', 'workbench.action.showAllSymbols', 'user.open'
+	]);
+	await setupIntelliJ(options);
+	assert.strictEqual(await readFile(path.join(user, 'keybindings.json'), 'utf8'), bindings);
 });
 
 test('setup refuses a destination inside the source installation', async t => {

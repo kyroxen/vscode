@@ -1,6 +1,6 @@
 # IntelliJ Java Development Defaults
 
-This fork uses the existing local IntelliJ Islands Dark palette, JetBrains Icons Enhanced 2.3.0, and IntelliJ IDEA Keybindings 1.7.8. The first-party extension supplies the theme, editor defaults, and keybindings. Fork-owned workbench contributions provide class search and Search Everywhere using native search and command providers. The selected external extensions are copied into a separate development profile; the installed VS Code profile is not modified.
+This fork defaults to Dark Modern and VS Code’s Seti file icons. It also includes the local IntelliJ Islands Dark palette, JetBrains Icons Enhanced 2.3.0, and IntelliJ IDEA Keybindings 1.7.8. The first-party extension supplies the theme, editor defaults, and keybindings. Fork-owned workbench contributions provide class search and Search Everywhere using native search and command providers. The selected external extensions are copied into a separate development profile; the installed VS Code profile is not modified.
 
 ## Setup and Launch
 
@@ -21,12 +21,25 @@ The extension stack includes Java language support, debugger, test runner, proje
 
 After source edits, run `pnpm run build-fast --client-only`. For edits to existing client modules, use Cmd+Shift+A and select Developer: Reload Window. When a change adds or removes a CSS module, fully quit Code - OSS with Cmd+Q and relaunch with `./scripts/code-intellij.sh`. The development main process caches the CSS module import map; a window reload cannot refresh that cache. A stale map can produce a CSS MIME-type error and prevent the workbench from loading. The new navigation popup stylesheet requires this full restart the first time it is added.
 
+## Project Appearance
+
+Java projects can select the bundled IntelliJ appearance using native workspace settings in `.vscode/settings.json`:
+
+```json
+{
+  "workbench.colorTheme": "IntelliJ Islands Dark",
+  "workbench.iconTheme": "vsc-jetbrains-icons-enhanced"
+}
+```
+
+Projects without these overrides use Dark Modern and Seti. Opening another project window applies that project's settings; appearance does not change when switching individual source files. New Java projects need the workspace override once. Explicit user and workspace preferences continue to take precedence over the fork defaults.
+
 ## Navigation and Keyboard Behavior
 
 - Cmd+click and Cmd+B use language-provider definitions, including dependency sources. At the sole declaration, the existing alternative action finds usages.
 - Cmd+Option+B navigates to implementations. Multiple Java definition, declaration, type, implementation, and usage destinations open an anchored popup with file/line labels and source snippets. Filter by file or path, narrow to Current File, navigate with the arrow keys, press Enter to open, or Escape to cancel. Open Results expands into the existing full Peek view. Explicit Peek commands remain available.
 - Cmd+Option+F7 opens the same compact usages popup. Cmd+click/Cmd+B at a declaration retains the declaration-to-usages fallback.
-- The popup stays within the active editor and opens above the symbol when space below is limited. Results use a bounded scrolling viewport. Drag the bottom-right grip to resize the popup; drag the dividers in the File / Source / Path header to resize columns. Focus these handles and use arrow keys (Shift for larger steps); double-click resets their sizes. Icons appear only in category headings, with compact count badges and borders between sections. Result rows use a darker background than section headings. The initial result is not painted as selected while the filter has focus. Collapsing sections preserves the opening position, constrained to the editor bounds. File / Source / Path headings have a contrasting background and share column boundaries with the result rows. Labels inherit the native workbench UI font; snippets follow the active editor font family and size. Hover a result to preview up to five source lines around the reference, with the matching line highlighted. Previews share the popup’s top layer so they render above it.
+- In dark themes, the popup and source previews keep the Islands surface palette, including when the editor uses Dark Modern. These color overrides are scoped to this popup; light and high-contrast themes retain their native colors. The popup stays within the active editor and opens above the symbol when space below is limited. Results use a bounded scrolling viewport. Drag the bottom-right grip to resize the popup; drag the dividers in the File / Source / Path header to resize columns. Focus these handles and use arrow keys (Shift for larger steps); double-click resets their sizes. Icons appear only in category headings, with compact count badges and borders between sections. Result rows use a darker background than section headings. The initial result is not painted as selected while the filter has focus. Collapsing sections preserves the opening position, constrained to the editor bounds. File / Source / Path headings have a contrasting background and share column boundaries with the result rows. Labels inherit the native workbench UI font; snippets follow the active editor font family and size. Hover a result to preview up to five source lines around the reference, with the matching line highlighted. Previews share the popup’s top layer so they render above it.
 - Reference results are grouped by type: Implementations, Production Usages, Test Usages, Documentation References, Declarations, Imports, and Configuration / Resource References. Empty categories are omitted. Other References contains results without enough provider metadata or source to classify. Groups show counts, collapse with Left/Right or Enter, and keep the existing result-row design. Group by Type toggles grouping; Current File and path filtering apply to all categories. Header totals count references, including definitions and documentation, rather than presenting them all as executable usages.
 - Implementations and declarations come from language-provider targets. Documentation classification recognizes JavaDoc comments while ignoring comment markers inside Java strings/text blocks. Test usage detection follows conventional test source roots and Java test class names, rather than a complete build-system test model. Semantic implementation/declaration roles take precedence over file location: a test implementation stays under Implementations. Configuration/resource categories cover locations returned by the provider; grouping does not discover additional Spring relationships.
 - Cmd+O searches classes, interfaces, enums, and records. Cmd+Shift+O searches files. Cmd+Option+O searches workspace symbols. Cmd+F12 searches the current file's structure.
@@ -41,7 +54,7 @@ The existing keymap handles editing, run/debug, and tool-window shortcuts. Setup
 
 The fork uses an blue seated cat on a white app tile for desktop and web branding. The shared SVG, regeneration command, and existing-bundle refresh instructions are documented under Fork Branding in the [sync guide](../../scripts/intellij/UPSTREAM-SYNC.md). Empty-editor watermarks retain their theme-specific monochrome treatment.
 
-The popup, search contribution, setup, and theme live in fork-owned modules. Six small upstream integration points are documented in [the sync guide](../../scripts/intellij/UPSTREAM-SYNC.md), along with the required behavior checks and regression-test commands. The guide includes the earlier changes from this chat. This reduces merge friction; upstream API and lifecycle changes can still require adaptation.
+The popup, search contribution, setup, and theme live in fork-owned modules. Nine small upstream integration points are documented in [the sync guide](../../scripts/intellij/UPSTREAM-SYNC.md), along with the required behavior checks and regression-test commands. The guide includes the earlier changes from this chat. This reduces merge friction; upstream API and lifecycle changes can still require adaptation.
 
 ## Scope
 

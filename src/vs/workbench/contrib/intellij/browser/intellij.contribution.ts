@@ -11,6 +11,7 @@ import { SourceOriginContribution } from './sourceOrigin.js';
 import { Registry } from '../../../../platform/registry/common/platform.js';
 import { IntelliJClassQuickAccessProvider, IntelliJGoToClassAction } from './classSearch.js';
 import { IntelliJQuickAccessProvider, IntelliJSearchEverywhereAction } from './searchEverywhere.js';
+import './appearance.css';
 
 Registry.as<IQuickAccessRegistry>(Extensions.Quickaccess).registerQuickAccessProvider({
 	ctor: IntelliJQuickAccessProvider,

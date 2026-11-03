@@ -29,7 +29,7 @@ import { EditorOption } from '../../../../common/config/editorOptions.js';
 import { LocationLink } from '../../../../common/languages.js';
 import { IRange, Range } from '../../../../common/core/range.js';
 import { ILanguageFeaturesService } from '../../../../common/services/languageFeatures.js';
-import { classifyReference, javaDocumentationRanges, ReferenceCategory, referenceCategoryLabel, referenceCategoryOrder, referenceClassificationTargets } from './referenceCategories.js';
+import { classifyReference, documentationRanges, ReferenceCategory, referenceCategoryLabel, referenceCategoryOrder, referenceClassificationTargets } from './referenceCategories.js';
 import { IResolvedTextEditorModel, ITextModelService } from '../../../../common/services/resolverService.js';
 import { OneReference, ReferencesModel } from '../referencesModel.js';
 import './symbolNavigationPopup.css';
@@ -66,7 +66,6 @@ interface UsageTemplate {
 	readonly icon: HTMLElement;
 	readonly file: HTMLElement;
 	readonly fileCell: HTMLElement;
-	readonly badge: HTMLElement;
 	readonly sourceCell: HTMLElement;
 	readonly hover: DisposableStore;
 	preview?: HTMLElement;
@@ -326,7 +325,23 @@ export class SymbolNavigationPopup extends Disposable {
 			indent: 0,
 			expandOnlyOnTwistieClick: false
 		}));
-		list.style(defaultListStyles);
+		const selectionBackground = 'color-mix(in srgb, var(--vscode-editorWidget-foreground) 12%, var(--vscode-editor-background))';
+		const focusOutline = 'color-mix(in srgb, var(--vscode-editorWidget-foreground) 60%, var(--vscode-editor-background))';
+		list.style({
+			...defaultListStyles,
+			listFocusBackground: selectionBackground,
+			listActiveSelectionBackground: selectionBackground,
+			listFocusAndSelectionBackground: selectionBackground,
+			listInactiveSelectionBackground: selectionBackground,
+			listInactiveFocusBackground: selectionBackground,
+			listFocusForeground: 'var(--vscode-editorWidget-foreground)',
+			listActiveSelectionForeground: 'var(--vscode-editorWidget-foreground)',
+			listFocusAndSelectionForeground: 'var(--vscode-editorWidget-foreground)',
+			listFocusOutline: focusOutline,
+			listFocusAndSelectionOutline: focusOutline,
+			listSelectionOutline: focusOutline,
+			listInactiveFocusOutline: focusOutline
+		});
 		store.add(list.onDidChangeFocus(event => list.setSelection([...event.elements])));
 		store.add(list.onDidChangeCollapseState(event => {
 			const item = event.node.element;
@@ -411,12 +426,11 @@ export class SymbolNavigationPopup extends Disposable {
 				icon.classList.add(...ThemeIcon.asClassNameArray(Codicon.symbolMethod));
 				icon.setAttribute('aria-hidden', 'true');
 				const file = dom.append(fileCell, dom.$('span.intellij-symbol-popup-file'));
-				const badge = dom.append(fileCell, dom.$('span.intellij-symbol-popup-origin'));
 				const sourceCell = dom.append(row, dom.$('.intellij-symbol-popup-source-cell'));
 				const line = dom.append(sourceCell, dom.$('span.intellij-symbol-popup-line'));
 				const code = new HighlightedLabel(dom.append(sourceCell, dom.$('span.intellij-symbol-popup-code')));
 				const path = dom.append(row, dom.$('span.intellij-symbol-popup-path'));
-				const template: UsageTemplate = { row, icon, file, fileCell, badge, sourceCell, line, code, path, hover: new DisposableStore() };
+				const template: UsageTemplate = { row, icon, file, fileCell, sourceCell, line, code, path, hover: new DisposableStore() };
 				const delegate = getDefaultHoverDelegate('element');
 				template.hover.add(this.hoverService.setupManagedHover({
 					delay: delegate.delay,
@@ -440,10 +454,7 @@ export class SymbolNavigationPopup extends Disposable {
 				this.applyCodeFont(template.code.element.parentElement!);
 				template.icon.className = `intellij-symbol-popup-icon ${ThemeIcon.asClassName(categoryIcons[row.category])}`;
 				template.file.textContent = row.file;
-				template.badge.hidden = row.kind === 'group';
-				template.badge.textContent = row.kind === 'usage' ? row.origin.label : '';
-				template.path.textContent = row.kind === 'usage' && row.origin.detail
-					? [row.origin.detail, row.origin.packageName].filter(Boolean).join(' · ') : row.path;
+				template.path.textContent = row.path;
 				template.file.title = row.file;
 				template.path.title = row.path;
 				if (row.kind === 'group') {
@@ -463,7 +474,7 @@ export class SymbolNavigationPopup extends Disposable {
 						const snippet = usageSnippet(textModel.getLineContent(range.startLineNumber), range);
 						template.code.set(snippet.text, [{ start: snippet.start, end: snippet.end }]);
 						const preview = dom.$('.intellij-symbol-popup-preview');
-						dom.append(preview, dom.$('div.intellij-symbol-popup-preview-title')).textContent = `${row.origin.description}\n${row.path}:${range.startLineNumber}`;
+						dom.append(preview, dom.$('div.intellij-symbol-popup-preview-title')).textContent = `${row.path}:${range.startLineNumber}`;
 						const code = dom.append(preview, dom.$('pre'));
 						this.applyCodeFont(code);
 						for (let line = Math.max(1, range.startLineNumber - 2); line <= Math.min(textModel.getLineCount(), range.startLineNumber + 2); line++) {
@@ -546,7 +557,7 @@ export class SymbolNavigationPopup extends Disposable {
 						return;
 					}
 					const textModel = reference?.object.textEditorModel;
-					const documentation = textModel && /\.java$/i.test(uri.path) ? javaDocumentationRanges(textModel.getValue()) : [];
+					const documentation = textModel ? documentationRanges(textModel) : [];
 					for (const row of this.rows) {
 						if (isEqual(row.reference.uri, uri)) {
 							row.category = classifyReference(row.reference, textModel, documentation, definitions, implementations, complete);
@@ -673,6 +684,12 @@ export class SymbolNavigationPopup extends Disposable {
 
 	private applyCodeFont(element: HTMLElement): void {
 		applyFontInfo(element, this.editor.getOption(EditorOption.fontInfo));
+		// Compact previews share the editor's typeface, size, and weight; their
+		// line spacing and shaping belong to the popup rather than the code editor.
+		element.style.lineHeight = '';
+		element.style.letterSpacing = '';
+		element.style.fontFeatureSettings = '';
+		element.style.fontVariationSettings = '';
 	}
 
 	private layout(): void {

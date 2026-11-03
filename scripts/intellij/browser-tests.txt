@@ -3,3 +3,4 @@ src/vs/editor/contrib/gotoSymbol/test/browser/symbolNavigationPopup.test.ts
 src/vs/editor/contrib/gotoSymbol/test/browser/referenceCategories.test.ts
 src/vs/workbench/contrib/quickaccess/test/browser/intellijQuickAccess.test.ts
 src/vs/workbench/contrib/quickaccess/test/browser/sourceOrigin.test.ts
+src/vs/workbench/test/browser/parts/editor/breadcrumbsTail.test.ts

@@ -8,6 +8,8 @@ import { CancellationToken } from '../../../../../base/common/cancellation.js';
 import { localize } from '../../../../../nls.js';
 import { Range } from '../../../../common/core/range.js';
 import { Position } from '../../../../common/core/position.js';
+import { StandardTokenType } from '../../../../common/encodedTokenAttributes.js';
+import { getStandardTokenTypeAtPosition } from '../../../../common/tokens/lineTokens.js';
 import { LocationLink, ProviderResult } from '../../../../common/languages.js';
 import { ITextModel } from '../../../../common/model.js';
 import { ILanguageFeaturesService } from '../../../../common/services/languageFeatures.js';
@@ -107,6 +109,85 @@ export function javaDocumentationRanges(source: string): { start: number; end: n
 	return result;
 }
 
+/** Reuse language tokenization so JSDoc-looking strings, regexes, and JSX stay code. */
+export function documentationRanges(model: ITextModel): { start: number; end: number }[] {
+	if (model.getLanguageId() === 'java' || /\.java$/i.test(model.uri.path)) {
+		return javaDocumentationRanges(model.getValue());
+	}
+	if (!/^(?:javascript|javascriptreact|typescript|typescriptreact)$/.test(model.getLanguageId())) {
+		return [];
+	}
+	const result: { start: number; end: number }[] = [];
+	const text = model.getValue();
+	for (const match of text.matchAll(/\/\*\*/g)) {
+		const start = match.index;
+		const position = model.getPositionAt(start);
+		if (position.lineNumber > 1) {
+			const previous = model.getLineContent(position.lineNumber - 1);
+			const previousPosition = { lineNumber: position.lineNumber - 1, column: Math.max(1, previous.length) };
+			if (getStandardTokenTypeAtPosition(model, previousPosition) === StandardTokenType.Comment && !previous.trimEnd().endsWith('*/')) {
+				const tokens = model.tokenization.getLineTokens(previousPosition.lineNumber);
+				const token = tokens.findTokenIndexAtOffset(previousPosition.column - 1);
+				if (!previous.slice(tokens.getStartOffset(token)).startsWith('//')) {
+					continue; // Still inside an existing block comment.
+				}
+			}
+		}
+		if (getStandardTokenTypeAtPosition(model, position) === StandardTokenType.Comment) {
+			const line = model.getLineContent(position.lineNumber);
+			const tokens = model.tokenization.getLineTokens(position.lineNumber);
+			const token = tokens.findTokenIndexAtOffset(position.column - 1);
+			// An apparent opener inside an ordinary comment is not a JSDoc block.
+			if (tokens.getStartOffset(token) === position.column - 1 && line.startsWith('/**', position.column - 1)) {
+				const end = text.indexOf('*/', start + 2);
+				result.push({ start, end: end < 0 ? text.length : end + 2 });
+			}
+		}
+	}
+	return result;
+}
+
+function isImportReference(reference: OneReference, source: ITextModel): boolean {
+	const lineNumber = reference.range.startLineNumber;
+	const line = source.getLineContent(lineNumber);
+	const semicolon = line.indexOf(';');
+	if (semicolon >= 0 && reference.range.startColumn - 1 > semicolon) {
+		return false;
+	}
+	if (/^\s*import\s+/.test(line)) {
+		return true;
+	}
+	if (!/\.(?:[cm]?[jt]sx?)$/i.test(reference.uri.path)) {
+		return false;
+	}
+	// Only classify the binding/module part of a single statement. Usage later on
+	// the same line must not become an import merely because require() precedes it.
+	const commonJS = /^\s*(?:const|let|var)\s+[^;]+?=\s*require\s*\([^)]*\)/.exec(line);
+	if (commonJS && reference.range.endColumn - 1 <= commonJS[0].length) {
+		return true;
+	}
+	if (/^\s*export\s+(?:\*(?:\s+as\s+\w+)?|\{[^}]*\})\s*from\s*['"]/.test(line)) {
+		return true;
+	}
+	// Named multiline imports/re-exports are bounded by their braces; avoid
+	// searching through unrelated statements or guessing from identifier names.
+	let statement = '';
+	for (let previous = lineNumber; previous >= Math.max(1, lineNumber - 30); previous--) {
+		const previousLine = source.getLineContent(previous);
+		statement = statement ? `${previousLine}\n${statement}` : previousLine;
+		if (/^\s*(?:import|export)\s*\{/.test(statement)) {
+			for (let next = lineNumber + 1; next <= Math.min(source.getLineCount(), lineNumber + 30) && !statement.includes('}'); next++) {
+				statement += `\n${source.getLineContent(next)}`;
+			}
+			return /^\s*(?:import|export)\s*\{[^}]*\}\s*from\s*['"]/.test(statement);
+		}
+		if (/[;}]/.test(previousLine)) {
+			break;
+		}
+	}
+	return false;
+}
+
 function isTarget(reference: OneReference, targets: readonly LocationLink[]): boolean {
 	return targets.some(target => {
 		const selection = target.targetSelectionRange ?? target.range;
@@ -133,11 +214,12 @@ export function classifyReference(reference: OneReference, source: ITextModel | 
 	if (/\.(?:md|mdx|rst|adoc)$/i.test(path) || documentation.some(range => range.start <= offset && offset < range.end)) {
 		return 'documentation';
 	}
-	if (/^\s*import\s+/.test(source.getLineContent(reference.range.startLineNumber))) {
+	if (isImportReference(reference, source)) {
 		return 'imports';
 	}
 	// Conventional source roots and names are evidence, not a full build-system test model.
-	if (/(?:^|\/)(?:test|tests|src\/test[^/]*|src\/integrationTest|src\/functionalTest|src\/e2e)(?:\/|$)/i.test(path)
+	if (/(?:^|\/)(?:test|tests|__tests__|src\/test[^/]*|src\/integrationTest|src\/functionalTest|src\/e2e)(?:\/|$)/i.test(path)
+		|| /\.(?:test|spec)\.[cm]?[jt]sx?$/i.test(path)
 		|| /(?:^|\/)(?:Test[^/]*|[^/]*(?:Test|Tests|IT|ITCase|Spec))\.java$/.test(path)) {
 		return 'tests';
 	}
